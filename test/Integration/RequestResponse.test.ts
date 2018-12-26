@@ -50,6 +50,22 @@ describe('Request to response server communication', function() {
                 done();
             });
         });
+
+        it('Sends data without a hook and retrives data returned from hook in createResponse.', function(done) {
+            let mockRequestData = { bar: "baz" };
+            requestServer.createRequest("foo2", responseServerId);
+
+            responseServer.createResponse("foo2", function(data) {
+                assert.deepStrictEqual(data, mockRequestData);
+                data.bar = "baz2";
+                return data;
+            });
+
+            requestServer.requests.foo2({ bar: "baz" }).then(response => {
+                assert.strictEqual(response.bar, "baz2");
+                done();
+            });
+        });
     });
 
 });
