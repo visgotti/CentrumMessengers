@@ -20,8 +20,7 @@ export interface RESPONSE_MESSAGE  {
     data: any,
 }
 
-export type RequestOptions = {
-    backServerIds?: Array<string>,
+export interface RequestOptions {
     timeout?: number,
 }
 
@@ -73,7 +72,7 @@ export class Centrum {
     private initializeMessengers(options: CentrumOptions) {
         if(options.request) {
             this.requests = {};
-            this.requester = new Requester(this.dealerSocket);
+            this.requester = new Requester(this.dealerSocket, options.request);
             this.createRequest = this._createRequest;
         }
 

@@ -1,9 +1,8 @@
 import { Requester } from './Requester';
-import { Sequence, Hook } from '../../Centrum';
+import { Hook } from '../../Centrum';
 
 export class RequestFactory {
     readonly name: string;
-    private sequence: Sequence;
     private beforeRequestHook: Hook;
     private requester: Requester;
     private to: string;
@@ -12,7 +11,6 @@ export class RequestFactory {
         this.name = name;
         this.to = to;
         this.requester = requester;
-        this.sequence = 0;
         this.beforeRequestHook = beforeRequestHook;
     }
 
