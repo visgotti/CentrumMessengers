@@ -49,12 +49,12 @@ Simple request/response servers:
       var broker = new Broker(brokerURI, "broker_id");
 
 
-   this is all CentrumOptions look like for now.. eventually as I build the library I will find new uses for the options instead
-   of just telling Centrum which messengers it's using. This is also why I'm keeping it like this for now if you look into
-   Centrum.ts you can see how the initializeMessenger function works and by doing this way I will be able easily add new option processing
-   in the future.
+   this is all CentrumOptions look like for now.. eventually as I build the library I will update the
+   options examples below with the newest params.
 
-      var requestOptions = { request: true };
+      var requestOptions = { request:
+         { timeout: 1000 }  // defaults to 5000 (milliseconds)
+      };
 
       var responseOptions = { response: true };
 
@@ -75,7 +75,7 @@ Simple request/response servers:
    and whatever it returns gets sent as a data param to the response server.
 
 
-      requestServer.create("foo", "response server", function(x) { return bar * 5 })
+      requestServer.createRequest("foo", "response server", function(x) { return bar * 5 })
 
    now called like
 
@@ -83,13 +83,20 @@ Simple request/response servers:
 
    it's asynchronous so to get the response either
 
-      await response = requestServer.requests.foo(10);
+      const response = await requestServer.requests.foo(10);
 
    or
 
       requestServer.requests.foo(10).then(response => {}).catch(err => {});
 
+   if you don't want to use hook/function before sending the request and just want to simply
+   send data you can omit the hook parameter completely.
 
+       requestServer.createRequest("foo", "response server");
+
+   now called like
+
+      const response = await requestServer.requests.foo({ bar: "baz" });
 
    Now.. this won't work until you set up the responseServer. Eventually I plan on doing some sort of run-time check
    to make sure all requests have a response listening for it as well as making sure corresponding hook's follow same
