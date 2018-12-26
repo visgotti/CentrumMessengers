@@ -24,22 +24,31 @@ export interface RequestOptions {
     timeout?: number,
 }
 
+export interface PublishOptions {
+    PubSocketURI: string,
+}
+
+export interface SubscribeOptions {
+    PubURIs: Array<string>,
+}
+
 export interface CentrumOptions {
     request?: RequestOptions,
     respond?: boolean,
     notify?: boolean,
-    publish?: boolean,
-    subscribe?: boolean,
+    publish?: PublishOptions,
+    subscribe?: SubscribeOptions,
 }
 
-import { Requester } from './Messengers/Request/Requester';
-import { RequestFactory } from './Messengers/Request/RequestFactory';
-import { Responder } from './Messengers/Respond/Responder';
+import { Requester } from './Messengers/Requester';
+import { Responder } from './Messengers/Responder';
+import { Publisher } from "./Messengers/Publisher";
 
 export class Centrum {
     public serverId: string;
     public requests?: { [name: string]: Function };
     public responses?: Set<string>;
+    public publish?: { [name: string]: Function };
     public requester?: Requester;
     public responder?: any;
     public notifier?: any;
@@ -47,7 +56,10 @@ export class Centrum {
     public publisher?: any;
 
     private brokerURI: string;
+
     private dealerSocket: any;
+    private pubSocket: any;
+    private subSocket: any;
 
     constructor(serverId, brokerURI, options: CentrumOptions) {
         this.serverId = serverId;
@@ -55,6 +67,10 @@ export class Centrum {
         this.dealerSocket = zmq.socket('dealer');
         this.dealerSocket.identity = serverId;
         this.dealerSocket.connect(brokerURI);
+        this.pubSocket = null;
+
+        this.publish = null;
+        this.publisher = null;
 
         this.requests = null;
         this.requester = null;
@@ -81,6 +97,13 @@ export class Centrum {
             this.responder = new Responder(this.dealerSocket);
             this.createResponse = this._createResponse;
         }
+
+        if(options.publish) {
+            this.pubSocket = zmq.socket('pub');
+            this.pubSocket.bind(options.publish.PubSocketURI);
+            this.publisher = new Publisher(this.pubSocket);
+            this.createPublish = this._createPublish;
+        }
     }
 
     /**
@@ -90,9 +113,10 @@ export class Centrum {
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.
      * @param beforeRequestHook - Hook that's used if you want to process data before sending it,
+     * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
-    public createRequest(name: string, to: string, beforeRequestHook: Hook) { throw new Error('Server is not configured to make this action') }
+    public createRequest(name: string, to: string, beforeRequestHook?: Hook) { throw new Error('Server is not configured to make requests.') }
 
     /**
      * If options.response was passed into constructor, you can use this function to create
@@ -101,22 +125,25 @@ export class Centrum {
      * @param name - unique name of request which will be used
      * @param onRequestHook - Hook to process data from request, whatever it returns gets sent back
      */
-    public createResponse(name: string, onRequestHandler: Hook) { throw new Error('Server is not configured to make this action') }
+    public createResponse(name: string, onRequestHandler: Hook) { throw new Error('Server is not configured to make responses.') }
 
+    public createPublish(name: string, beforeHook?: Hook) { throw new Error('Server is not configured to publish.') }
 
-    //TODO: implement and TEST!!!!!!!!!!!!!!!!!!!!!!
-    public createNotification() { throw new Error('Server is not configured to make this action') }
-    public createSubscription() { throw new Error('Server is not configured to make this action') }
-    public createPublisher() { throw new Error('Server is not configured to make this action') }
+    public createSubscription() { throw new Error('Server is not configured to subscribe.') }
 
+    private _createPublish(name: string, beforeHook?: Hook) {
+        if(this.publisher[name]) {
+            throw new Error(`Duplicate publisher name: ${name}`);
+        }
+        this.publish[name] = !beforeHook ? this.publisher.makeForData() : this.publisher.makeForHook(beforeHook);
+    }
 
-    private _createRequest(name: string, to: string, beforeRequestHook: Hook) {
+    private _createRequest(name: string, to: string, beforeRequestHook?: Hook) {
         if(this.requests[name]) {
             throw new Error(`Duplicate request name: ${name}`);
         }
-        const requestFactory = new RequestFactory(name, to, beforeRequestHook, this.requester);
-        this.requests[name] = requestFactory.make();
-    };
+        this.requests[name] = !beforeRequestHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeRequestHook);
+    }
 
     private _createResponse(name: string, onRequestHandler: Hook) {
         if(this.responses.has(name)) {

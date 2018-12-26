@@ -1,4 +1,4 @@
-import { REQUEST_MESSAGE, RESPONSE_MESSAGE, Hook } from '../../Centrum';
+import { REQUEST_MESSAGE, RESPONSE_MESSAGE, Hook } from '../Centrum';
 
 
 export class Responder {

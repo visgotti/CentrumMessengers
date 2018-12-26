@@ -1,6 +1,6 @@
-import { DealerSocket } from '../../Mocks/DealerSocket';
+import { DealerSocket } from '../Mocks/zmq';
 
-import { Responder } from '../../../src/core/Messengers/Respond/Responder';
+import { Responder } from '../../src/core/Messengers/Responder';
 
 import * as assert from 'assert';
 import * as mocha from 'mocha'

@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as mocha from 'mocha'
+import * as mocha from 'mocha';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -21,7 +21,7 @@ describe('Request to response server communication', function() {
         let brokerURI = config.broker.ROUTER_URI;
         broker = new Broker(brokerURI, "TEST_BROKER");
 
-        const requestOptions = { "request": true };
+        const requestOptions = { "request": { timeout: 5000 } };
         const responseOptions = { "respond": true };
 
         requestServer = new Centrum(requestServerId, brokerURI, requestOptions);
@@ -49,7 +49,6 @@ describe('Request to response server communication', function() {
                 assert.strictEqual(response, 22);
                 done();
             });
-
         });
     });
 

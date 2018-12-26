@@ -1,4 +1,4 @@
-import { REQUEST_MESSAGE, RequestOptions, Sequence } from '../../Centrum';
+import { REQUEST_MESSAGE, RequestOptions, Sequence, Hook } from '../Centrum';
 import Timeout = NodeJS.Timeout;
 
 export class Requester {
@@ -17,13 +17,40 @@ export class Requester {
         this.registerResponseHandler();
     }
 
+    public makeForHook(name, to, beforeHook: Hook) {
+        return ((...args) => {
+            const sendData = beforeHook(...args);
+            return new Promise((resolve, reject) => {
+                this.sendRequest(sendData, name, to, (err, receivedData) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(receivedData);
+                });
+            });
+        });
+    }
+
+    public makeForData(name, to) {
+        return ((data: any) => {
+            return new Promise((resolve, reject) => {
+                this.sendRequest(data, name, to, (err, receivedData) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(receivedData);
+                });
+            });
+        });
+    }
+
     /**
      * @param data - user data that's meant to be sent and processed
      * @param name - name of the request
      * @param to - id of the server being sent to
      * @param onResponse - function called asynchronously when received response
      */
-    public sendRequest(data, name, to, onResponse) {
+    private sendRequest(data, name, to, onResponse) {
         const request: REQUEST_MESSAGE = {
             name,
             from: this.dealerSocket.identity,
