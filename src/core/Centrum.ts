@@ -25,7 +25,7 @@ export interface RequestOptions {
 }
 
 export interface CentrumOptions {
-    request?: boolean,
+    request?: RequestOptions,
     respond?: boolean,
     notify?: boolean,
     publish?: boolean,
