@@ -60,8 +60,8 @@ Simple request/response servers:
 
 
 
-    create the instances of each server. These should normally live on different processes at the least.
-    each use a zmq dealer socket so they both need the brokerURI for routing purposes.
+   create the instances of each server. These should normally live on different processes at the least.
+   each use a zmq dealer socket so they both need the brokerURI for routing purposes.
 
 
       var requestServer = new Centrum("request server", brokerURI, requestOptions);
@@ -70,9 +70,9 @@ Simple request/response servers:
 
 
 
-    now when you want to create your request
-    this will allow you to now call foo with the same parameters as the function
-    and whatever it returns gets sent as a data param to the response server.
+   now when you want to create your request
+   this will allow you to now call foo with the same parameters as the function
+   and whatever it returns gets sent as a data param to the response server.
 
 
       requestServer.create("foo", "response server", function(x) { return bar * 5 })
