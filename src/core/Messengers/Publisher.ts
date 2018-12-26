@@ -15,8 +15,8 @@ export class Publisher {
         });
     }
 
-    public makeForData() {
-        return ((name, data) => {
+    public makeForData(name) {
+        return ((data) => {
             const encoded = JSON.stringify(data);
             this.pubSocket.send([name, encoded]);
         });
