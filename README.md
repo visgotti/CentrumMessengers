@@ -39,52 +39,75 @@ EXAMPLE ------------------------------------------------------------------------
 
 Simple request/response servers:
 
-   //Creating the broker is vital since it uses zmq's router socket to make sure requests and responses get
-   // to the correct destination.. all you need to do is call the constructor with a URI and ID.
+   Creating the broker is vital since it uses zmq's router socket to make sure requests and responses get
+   to the correct destination.. all you need to do is call the constructor with a URI and ID.
 
-   // eventually a lot of this will be done in the centrum loader automatically from your centrum.config when I get around to it.
+   eventually a lot of this will be done in the centrum loader automatically from your centrum.config when I get around to it.
 
-   var brokerURI = "tcp://127.0.0.1:4200";
-   var broker = new Broker(brokerURI, "broker_id");
+      var brokerURI = "tcp://127.0.0.1:4200";
+
+      var broker = new Broker(brokerURI, "broker_id");
 
 
-   // this is all CentrumOptions look like for now.. eventually as I build the library I will find new uses for the options instead
-   // of just telling Centrum which messengers it's using. This is also why I'm keeping it like this for now if you look into
-   // Centrum.ts you can see how the initializeMessenger function works and by doing this way I will be able easily add new option processing
-   // in the future.
-   var requestOptions = { request: true };
-   var responseOptions = { response: true };
+   this is all CentrumOptions look like for now.. eventually as I build the library I will find new uses for the options instead
+   of just telling Centrum which messengers it's using. This is also why I'm keeping it like this for now if you look into
+   Centrum.ts you can see how the initializeMessenger function works and by doing this way I will be able easily add new option processing
+   in the future.
 
-   // create the instances of each server. These should normally live on different processes at the least.
-   // each use a zmq dealer socket so they both need the brokerURI for routing purposes.
-   var requestServer = new Centrum("request server", brokerURI, requestOptions);
-   var responseServer = new Centrum("response server", brokerURI, responseOptions);
+      var requestOptions = { request: true };
 
-   // now when you want to create your request
-   // this will allow you to now call foo with the same parameters as the function
-   // and whatever it returns gets sent as a data param to the response server.
-   requestServer.create("foo", "response server", function(x) { return bar * 5 })
+      var responseOptions = { response: true };
 
-   // now called like
-   requestServer.requests.foo(10);
 
-   // it's asynchronous so to get the response either
-   await response = requestServer.requests.foo(10);
+
+    create the instances of each server. These should normally live on different processes at the least.
+    each use a zmq dealer socket so they both need the brokerURI for routing purposes.
+
+
+      var requestServer = new Centrum("request server", brokerURI, requestOptions);
+
+      var responseServer = new Centrum("response server", brokerURI, responseOptions);
+
+
+
+    now when you want to create your request
+    this will allow you to now call foo with the same parameters as the function
+    and whatever it returns gets sent as a data param to the response server.
+
+
+      requestServer.create("foo", "response server", function(x) { return bar * 5 })
+
+   now called like
+
+      requestServer.requests.foo(10);
+
+   it's asynchronous so to get the response either
+
+      await response = requestServer.requests.foo(10);
+
    or
-   requestServer.requests.foo(10).then(response => {}).catch(err => {});
 
-   // Now.. this won't work until you set up the responseServer. Eventually I plan on doing some sort of run-time check
-   // to make sure all requests have a response listening for it as well as making sure corresponding hook's follow same
-   // parameters.
+      requestServer.requests.foo(10).then(response => {}).catch(err => {});
 
-   // Creating the response
-   // "data" in the function is what gets returned from the function we passed in requestServer.create
-   responseServer.createResponse("foo", function(data) { return data * 5 });
+
+
+   Now.. this won't work until you set up the responseServer. Eventually I plan on doing some sort of run-time check
+   to make sure all requests have a response listening for it as well as making sure corresponding hook's follow same
+   parameters.
+
+   Creating the response
+   "data" in the function is what gets returned from the function we passed in requestServer.create
+
+      responseServer.createResponse("foo", function(data) { return data * 5 });
+
+
+
 
    This function passed in works as the hook to process incoming request data. Whatever this hook
    returns will be sent back to the request server as the asynchronous result.
 
-   // So now when you call....
+   So now when you call....
+
       await response = requestServer.requests.foo(10);
 
       console.log(response) //250
