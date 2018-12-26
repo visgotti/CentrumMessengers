@@ -6,6 +6,13 @@ import * as zmq from 'zeromq';
  */
 export type Hook = (...args: any[]) => any;
 
+/*
+    Handler is a function that is used to process data
+    received from a server but does not worry about
+    sending data anywhere after that implicitly.
+ */
+export type Handler = (data: any) => void;
+
 export type Sequence = number;
 
 export interface REQUEST_MESSAGE  {
@@ -19,54 +26,61 @@ export interface RESPONSE_MESSAGE  {
     readonly sequence: number,
     data: any,
 }
+export interface CentrumConfig {
+    'broker': {
+        ['URI']: string,
+    }
+    ['servers']:
+        Array<{
+            ['name']: string,
+            ['centrumOptions']: any
+        }>
+}
 
 export interface RequestOptions {
     timeout?: number,
 }
 
 export interface PublishOptions {
-    PubSocketURI: string,
+    pubSocketURI: string,
 }
 
 export interface SubscribeOptions {
-    PubURIs: Array<string>,
+    pubSocketURIs: Array<string>,
 }
 
 export interface CentrumOptions {
+    id: string,
+    brokerURI?: string,
     request?: RequestOptions,
-    respond?: boolean,
-    notify?: boolean,
+    response?: boolean,
     publish?: PublishOptions,
     subscribe?: SubscribeOptions,
 }
 
 import { Requester } from './Messengers/Requester';
 import { Responder } from './Messengers/Responder';
-import { Publisher } from "./Messengers/Publisher";
+import { Publisher } from './Messengers/Publisher';
+import { Subscriber } from './Messengers/Subscriber';
 
 export class Centrum {
     public serverId: string;
     public requests?: { [name: string]: Function };
     public responses?: Set<string>;
+    public subscriptions?: Set<string>;
     public publish?: { [name: string]: Function };
     public requester?: Requester;
     public responder?: any;
     public notifier?: any;
     public subscriber?: any;
     public publisher?: any;
-
-    private brokerURI: string;
-
     private dealerSocket: any;
     private pubSocket: any;
     private subSocket: any;
 
-    constructor(serverId, brokerURI, options: CentrumOptions) {
-        this.serverId = serverId;
-        this.brokerURI = brokerURI;
-        this.dealerSocket = zmq.socket('dealer');
-        this.dealerSocket.identity = serverId;
-        this.dealerSocket.connect(brokerURI);
+    constructor(options: CentrumOptions) {
+        this.serverId = options.id;
+        this.dealerSocket = null;
         this.pubSocket = null;
 
         this.publish = null;
@@ -78,6 +92,9 @@ export class Centrum {
         this.responses = null;
         this.responder = null;
 
+        this.subscriptions = null;
+        this.subscriber = null;
+
         this.initializeMessengers(options);
     }
 
@@ -86,23 +103,42 @@ export class Centrum {
      * @param options
      */
     private initializeMessengers(options: CentrumOptions) {
+        if(options.brokerURI) {
+            this.dealerSocket = zmq.socket('dealer');
+            this.dealerSocket.identity = this.serverId;
+            this.dealerSocket.connect(options.brokerURI);
+        }
+
         if(options.request) {
+            if(!this.dealerSocket) throw `Please provide a broker URI in your centrumOptions for request server: ${this.serverId}`;
             this.requests = {};
             this.requester = new Requester(this.dealerSocket, options.request);
             this.createRequest = this._createRequest;
         }
 
-        if(options.respond) {
+        if(options.response) {
+            if(!this.dealerSocket) throw `Please provide a broker URI in your centrumOptions for response server: ${this.serverId}`;
             this.responses = new Set();
             this.responder = new Responder(this.dealerSocket);
             this.createResponse = this._createResponse;
         }
 
         if(options.publish) {
+            this.publish = {};
             this.pubSocket = zmq.socket('pub');
-            this.pubSocket.bind(options.publish.PubSocketURI);
+            this.pubSocket.bind(options.publish.pubSocketURI);
             this.publisher = new Publisher(this.pubSocket);
             this.createPublish = this._createPublish;
+        }
+
+        if(options.subscribe) {
+            this.subSocket = zmq.socket('sub');
+            for(let i = 0; i < options.subscribe.pubSocketURIs.length; i++) {
+                this.subSocket.connect(options.subscribe.pubSocketURIs[i]);
+            }
+            this.subscriptions = new Set();
+            this.subscriber = new Subscriber(this.subSocket);
+            this.createSubscription = this._createSubscription;
         }
     }
 
@@ -112,11 +148,11 @@ export class Centrum {
      * the name() function is the beforeRequestHook passed in.
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.
-     * @param beforeRequestHook - Hook that's used if you want to process data before sending it,
+     * @param beforeHook - Hook that's used if you want to process data before sending it,
      * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
-    public createRequest(name: string, to: string, beforeRequestHook?: Hook) { throw new Error('Server is not configured to make requests.') }
+    public createRequest(name: string, to: string, beforeHook?: Hook) { throw new Error('Server is not configured to make requests.') }
 
     /**
      * If options.response was passed into constructor, you can use this function to create
@@ -125,30 +161,39 @@ export class Centrum {
      * @param name - unique name of request which will be used
      * @param onRequestHook - Hook to process data from request, whatever it returns gets sent back
      */
-    public createResponse(name: string, onRequestHandler: Hook) { throw new Error('Server is not configured to make responses.') }
+    public createResponse(name: string, beforeHook: Hook) { throw new Error('Server is not configured to make responses.') }
 
     public createPublish(name: string, beforeHook?: Hook) { throw new Error('Server is not configured to publish.') }
 
-    public createSubscription() { throw new Error('Server is not configured to subscribe.') }
+    public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to subscribe.') }
+
+    private _createSubscription(name: string, handler: Handler) {
+        if(this.subscriptions.has(name)) {
+            throw new Error(`Duplicate subscription name: ${name}`);
+        }
+        this.subscriptions.add(name);
+        this.subscriber.addHandler(name, handler);
+    }
 
     private _createPublish(name: string, beforeHook?: Hook) {
         if(this.publisher[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-        this.publish[name] = !beforeHook ? this.publisher.makeForData() : this.publisher.makeForHook(beforeHook);
+        this.publish[name] = !beforeHook ? this.publisher.makeForData(name) : this.publisher.makeForHook(name, beforeHook);
     }
 
-    private _createRequest(name: string, to: string, beforeRequestHook?: Hook) {
+    private _createRequest(name: string, to: string, beforeHook?: Hook) {
         if(this.requests[name]) {
             throw new Error(`Duplicate request name: ${name}`);
         }
-        this.requests[name] = !beforeRequestHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeRequestHook);
+        this.requests[name] = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
     }
 
-    private _createResponse(name: string, onRequestHandler: Hook) {
+    private _createResponse(name: string, beforeHook: Hook) {
         if(this.responses.has(name)) {
             throw new Error(`Duplicate response name: ${name}`);
         }
-        this.responder.addOnRequestHandler(name, onRequestHandler);
+        this.responses.add(name);
+        this.responder.addOnRequestHook(name, beforeHook);
     }
 }

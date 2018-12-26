@@ -7,18 +7,18 @@ export class Publisher {
         this.pubSocket = pubSocket;
     }
 
-    public makeForHook(beforeHook: Hook) {
+    public makeForHook(name, beforeHook: Hook) {
         return ((...args) => {
             const sendData = beforeHook(...args);
             const encoded = JSON.stringify(sendData);
-            this.pubSocket.send([encoded]);
+            this.pubSocket.send([name, encoded]);
         });
     }
 
     public makeForData() {
-        return ((data) => {
+        return ((name, data) => {
             const encoded = JSON.stringify(data);
-            this.pubSocket.send([encoded]);
+            this.pubSocket.send([name, encoded]);
         });
     }
 }

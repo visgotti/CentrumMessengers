@@ -1,5 +1,58 @@
 {
   "broker": {
-    "ROUTER_URI": "tcp://127.0.0.1:4200"
-  }
+    "URI": "tcp://127.0.0.1:4200"
+  },
+  "servers": [
+    {
+      "centrumOptions":
+      {
+        "id": "requestServer1",
+        "request": {
+          "timeout": 5000
+        },
+        "brokerURI": "tcp://127.0.0.1:4200"
+      }
+    },
+    {
+      "centrumOptions":
+      {
+        "id": "responseServer1",
+        "response": true,
+        "brokerURI": "tcp://127.0.0.1:4200"
+      }
+    },
+    {
+      "centrumOptions":
+      {
+        "id": "pubServer1",
+        "publish": {
+          "pubSocketURI": "tcp://127.0.0.1:4201"
+        }
+      }
+    },
+    {
+      "centrumOptions": {
+        "id": "pubServer2",
+        "publish": {
+          "pubSocketURI": "tcp://127.0.0.1:4202"
+        }
+      }
+    },
+    {
+      "centrumOptions": {
+        "id": "subServer1",
+        "subscribe": {
+          "pubSocketURIs": ["tcp://127.0.0.1:4201", "tcp://127.0.0.1:4202"]
+        }
+      }
+    },
+    {
+      "centrumOptions": {
+        "id": "subServer2",
+        "subscribe": {
+          "pubSocketURIs": ["tcp://127.0.0.1:4201", "tcp://127.0.0.1:4202"]
+        }
+      }
+    }
+  ]
 }

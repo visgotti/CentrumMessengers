@@ -12,21 +12,23 @@ describe('Request to response server communication', function() {
     let requestServer;
     let responseServer;
 
-    const responseServerId = 'testResponseServer';
-    const requestServerId = 'testRequestServer';
-
-    before('Initialize two servers, one with a requester, one with a responder.', (done) => {
+    before('Initialize two servers, one as a requester, one as a responder.', (done) => {
         config = fs.readFileSync(path.resolve('test', 'centrum.config.json'));
         config = JSON.parse(config);
-        let brokerURI = config.broker.ROUTER_URI;
+        let brokerURI = config.broker.URI;
         broker = new Broker(brokerURI, "TEST_BROKER");
 
-        const requestOptions = { "request": { timeout: 5000 } };
-        const responseOptions = { "respond": true };
+        for(let i = 0; i < config.servers.length; i++) {
+            const serverData = config.servers[i];
+            if (!("request" in serverData.centrumOptions) && !("response" in serverData.centrumOptions)) continue;
+            let server = new Centrum(serverData.centrumOptions);
 
-        requestServer = new Centrum(requestServerId, brokerURI, requestOptions);
-        responseServer = new Centrum(responseServerId, brokerURI, responseOptions);
-
+            if (serverData.centrumOptions["request"]) {
+                requestServer = server;
+            } else if (serverData.centrumOptions["response"]) {
+                responseServer = server;
+            }
+        }
         setTimeout(() => {
             done();
         }, 500)
@@ -34,7 +36,7 @@ describe('Request to response server communication', function() {
 
     describe('Sending a request', function() {
         it('Sends data returned from the hook in createRequest and retrives data returned from hook in createResponse.', function(done) {
-            requestServer.createRequest("foo", responseServerId, function(x, y) {
+            requestServer.createRequest("foo", responseServer.serverId, function(x, y) {
                 assert.strictEqual(x, 5);
                 assert.strictEqual(y, 7);
                 return x + y;
@@ -53,7 +55,7 @@ describe('Request to response server communication', function() {
 
         it('Sends data without a hook and retrives data returned from hook in createResponse.', function(done) {
             let mockRequestData = { bar: "baz" };
-            requestServer.createRequest("foo2", responseServerId);
+            requestServer.createRequest("foo2", responseServer.serverId,);
 
             responseServer.createResponse("foo2", function(data) {
                 assert.deepStrictEqual(data, mockRequestData);
@@ -67,5 +69,4 @@ describe('Request to response server communication', function() {
             });
         });
     });
-
 });

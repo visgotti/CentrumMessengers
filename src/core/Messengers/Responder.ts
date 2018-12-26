@@ -3,12 +3,12 @@ import { REQUEST_MESSAGE, RESPONSE_MESSAGE, Hook } from '../Centrum';
 
 export class Responder {
     private dealerSocket: any;
-    private onRequestHandlers: Map<string, Function>;
+    private onRequestHooks: Map<string, Hook>;
 
     constructor(dealerSocket) {
         this.dealerSocket = dealerSocket;
-        this.onRequestHandlers = new Map();
-        this.registerOnRequestHandlers();
+        this.onRequestHooks = new Map();
+        this.registerOnRequestHooks();
     }
 
     /**
@@ -16,13 +16,13 @@ export class Responder {
      * @param name - name of the request
      * @param hook - function used to process and return data
      */
-    public addOnRequestHandler(name, hook: Hook) {
-        this.onRequestHandlers.set(name, hook);
+    public addOnRequestHook(name, hook: Hook) {
+        this.onRequestHooks.set(name, hook);
     }
 
-    public removeOnRequestHandler(name) {
-        if(this.onRequestHandlers.has(name)) {
-            this.onRequestHandlers.delete(name);
+    public removeOnRequestHook(name) {
+        if(this.onRequestHooks.has(name)) {
+            this.onRequestHooks.delete(name);
             return true;
         }
         return false;
@@ -37,14 +37,14 @@ export class Responder {
         this.dealerSocket.send([ toServerId, '', encoded]);
     }
 
-    private registerOnRequestHandlers() {
+    private registerOnRequestHooks() {
         this.dealerSocket.on('message', (...args) => {
             if (args[1]) {
                 const request = JSON.parse(args[1]) as REQUEST_MESSAGE;
                 const response = { sequence: request.sequence, data: {} } as RESPONSE_MESSAGE;
-                const onRequestHandler = this.onRequestHandlers.get(request.name);
-                if(onRequestHandler) {
-                    response.data = onRequestHandler(request.data);
+                const onRequestHook = this.onRequestHooks.get(request.name);
+                if(onRequestHook) {
+                    response.data = onRequestHook(request.data);
                 }
                 this.sendResponse(response, request.from);
             }

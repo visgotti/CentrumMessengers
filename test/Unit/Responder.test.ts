@@ -15,8 +15,8 @@ describe('Responder', function() {
     });
 
     it('responder.addOnRequestHandler adds hook', function (done) {
-        mockResponder.addOnRequestHandler("foo", function(bar) { return bar });
-        assert.deepStrictEqual(mockResponder.removeOnRequestHandler("foo"), true);
+        mockResponder.addOnRequestHook("foo", function(bar) { return bar });
+        assert.deepStrictEqual(mockResponder.removeOnRequestHook("foo"), true);
         done();
     });
 });
