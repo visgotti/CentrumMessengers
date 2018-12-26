@@ -75,8 +75,9 @@ Simple request/response servers:
    this will allow you to now call foo with the same parameters as the function
    and whatever it returns gets sent as a data param to the response server.
 
+      // request name, response server id, hook/data
 
-      requestServer.createRequest("foo", "response server", function(x) { return bar * 5 })
+      requestServer.createRequest("foo", "responseCentrumServer", function(x) { return bar * 5 })
 
    now called like
 
@@ -93,7 +94,7 @@ Simple request/response servers:
    if you don't want to use hook/function before sending the request and just want to simply
    send data you can omit the hook parameter completely.
 
-       requestServer.createRequest("foo", "response server");
+       requestServer.createRequest("foo", "responseCentrumServer");
 
    now called like
 
