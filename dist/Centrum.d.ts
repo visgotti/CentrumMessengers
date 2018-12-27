@@ -56,12 +56,14 @@ export declare class Centrum {
     private dealerSocket;
     private pubSocket;
     private subSocket;
+    private options;
     constructor(options: CentrumOptions);
     /**
      * sets and initializes available public functions based on centrum options passed in.
      * @param options
      */
     private initializeMessengers;
+    close(): void;
     /**
      * If options.request was passed into constructor, you can use this function to create
      * and send requests. After running this you can make your request by Centrum.requests.name() in which

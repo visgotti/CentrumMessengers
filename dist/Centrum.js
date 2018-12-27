@@ -18,6 +18,7 @@ class Centrum {
         this.responder = null;
         this.subscriptions = null;
         this.subscriber = null;
+        this.options = options;
         this.initializeMessengers(options);
     }
     /**
@@ -65,6 +66,17 @@ class Centrum {
             this.removeSubscription = this._removeSubscription;
         }
     }
+    close() {
+        if (this.pubSocket) {
+            this.pubSocket.close();
+        }
+        if (this.subSocket) {
+            this.subSocket.close();
+        }
+        if (this.dealerSocket) {
+            this.dealerSocket.close();
+        }
+    }
     /**
      * If options.request was passed into constructor, you can use this function to create
      * and send requests. After running this you can make your request by Centrum.requests.name() in which
@@ -107,14 +119,14 @@ class Centrum {
         }
     }
     _createPublish(name, beforeHook) {
-        if (this.publisher[name]) {
+        if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
         this.publish[name] = !beforeHook ? this.publisher.makeForData(name) : this.publisher.makeForHook(name, beforeHook);
     }
     _removePublish(name, beforeHook) {
-        if (this.publisher[name]) {
-            delete this.publisher[name];
+        if (this.publish[name]) {
+            delete this.publish[name];
         }
         else {
             throw new Error(`Publisher does not exist for name: ${name}`);
