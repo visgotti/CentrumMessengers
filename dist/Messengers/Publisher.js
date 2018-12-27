@@ -4,17 +4,17 @@ class Publisher {
     constructor(pubSocket) {
         this.pubSocket = pubSocket;
     }
-    makeForHook(beforeHook) {
+    makeForHook(name, beforeHook) {
         return ((...args) => {
             const sendData = beforeHook(...args);
             const encoded = JSON.stringify(sendData);
-            this.pubSocket.send([encoded]);
+            this.pubSocket.send([name, encoded]);
         });
     }
-    makeForData() {
+    makeForData(name) {
         return ((data) => {
             const encoded = JSON.stringify(data);
-            this.pubSocket.send([encoded]);
+            this.pubSocket.send([name, encoded]);
         });
     }
 }

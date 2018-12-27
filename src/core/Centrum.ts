@@ -77,6 +77,7 @@ export class Centrum {
     private dealerSocket: any;
     private pubSocket: any;
     private subSocket: any;
+    private options: CentrumOptions;
 
     constructor(options: CentrumOptions) {
         this.serverId = options.id;
@@ -94,7 +95,7 @@ export class Centrum {
 
         this.subscriptions = null;
         this.subscriber = null;
-
+        this.options = options;
         this.initializeMessengers(options);
     }
 
@@ -114,6 +115,7 @@ export class Centrum {
             this.requests = {};
             this.requester = new Requester(this.dealerSocket, options.request);
             this.createRequest = this._createRequest;
+            this.removeRequest = this._removeRequest;
         }
 
         if(options.response) {
@@ -121,6 +123,7 @@ export class Centrum {
             this.responses = new Set();
             this.responder = new Responder(this.dealerSocket);
             this.createResponse = this._createResponse;
+            this.removeResponse = this._removeResponse;
         }
 
         if(options.publish) {
@@ -129,6 +132,7 @@ export class Centrum {
             this.pubSocket.bind(options.publish.pubSocketURI);
             this.publisher = new Publisher(this.pubSocket);
             this.createPublish = this._createPublish;
+            this.removePublish = this._removePublish;
         }
 
         if(options.subscribe) {
@@ -139,6 +143,19 @@ export class Centrum {
             this.subscriptions = new Set();
             this.subscriber = new Subscriber(this.subSocket);
             this.createSubscription = this._createSubscription;
+            this.removeSubscription = this._removeSubscription;
+        }
+    }
+
+    public close() {
+        if(this.pubSocket) {
+            this.pubSocket.close();
+        }
+        if(this.subSocket) {
+            this.subSocket.close();
+        }
+        if(this.dealerSocket) {
+            this.dealerSocket.close();
         }
     }
 
@@ -152,7 +169,8 @@ export class Centrum {
      * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
-    public createRequest(name: string, to: string, beforeHook?: Hook) { throw new Error('Server is not configured to make requests.') }
+    public createRequest(name: string, to: string, beforeHook?: Hook) { throw new Error('Server is not configured to use requests.') }
+    public removeRequest(name) { throw new Error('Server is not configured to use requests.')}
 
     /**
      * If options.response was passed into constructor, you can use this function to create
@@ -161,11 +179,14 @@ export class Centrum {
      * @param name - unique name of request which will be used
      * @param onRequestHook - Hook to process data from request, whatever it returns gets sent back
      */
-    public createResponse(name: string, beforeHook: Hook) { throw new Error('Server is not configured to make responses.') }
+    public createResponse(name: string, beforeHook: Hook) { throw new Error('Server is not configured use responses.') }
+    public removeResponse(name) { throw new Error('Server is not configured to use responses.')}
 
     public createPublish(name: string, beforeHook?: Hook) { throw new Error('Server is not configured to publish.') }
+    public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
-    public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to subscribe.') }
+    public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
+    public removeSubscription(name) { throw new Error('Server is not configured to use subscriptions.')}
 
     private _createSubscription(name: string, handler: Handler) {
         if(this.subscriptions.has(name)) {
@@ -175,11 +196,28 @@ export class Centrum {
         this.subscriber.addHandler(name, handler);
     }
 
+    private _removeSubscription(name: string) {
+        if(this.subscriptions.has(name)) {
+            this.subscriber.removeHandler(name);
+            this.subscriptions.delete(name);
+        } else {
+            throw new Error(`Subscription does not exist for name: ${name}`);
+        }
+    }
+
     private _createPublish(name: string, beforeHook?: Hook) {
-        if(this.publisher[name]) {
+        if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
         this.publish[name] = !beforeHook ? this.publisher.makeForData(name) : this.publisher.makeForHook(name, beforeHook);
+    }
+
+    private _removePublish(name: string, beforeHook?: Hook) {
+        if(this.publish[name]) {
+            delete this.publish[name];
+        } else {
+            throw new Error(`Publisher does not exist for name: ${name}`);
+        }
     }
 
     private _createRequest(name: string, to: string, beforeHook?: Hook) {
@@ -189,11 +227,28 @@ export class Centrum {
         this.requests[name] = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
     }
 
+    private _removeRequest(name: string) {
+        if(this.requests[name]) {
+            delete this.requests[name]
+        } else {
+            throw new Error(`Request does not exist for name: ${name}`);
+        }
+    }
+
     private _createResponse(name: string, beforeHook: Hook) {
         if(this.responses.has(name)) {
             throw new Error(`Duplicate response name: ${name}`);
         }
         this.responses.add(name);
         this.responder.addOnRequestHook(name, beforeHook);
+    }
+
+    private _removeResponse(name: string) {
+        if(this.responses.has(name)) {
+            this.responses.delete(name);
+            this.responder.removeOnRequestHook(name);
+        } else {
+            throw new Error(`Response does not exist for name: ${name}`);
+        }
     }
 }

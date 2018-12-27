@@ -1,20 +1,20 @@
-import { REQUEST_MESSAGE, RequestOptions, Sequence, Hook } from '../Centrum';
+import { REQUEST_MESSAGE, RequestOptions, Hook, Sequence } from '../Centrum';
 import Timeout = NodeJS.Timeout;
 
 export class Requester {
     private dealerSocket: any;
     private onResponseHandlers: Map<Sequence, Function>;
     private awaitingResponseTimeouts: Map<Sequence, Timeout>;
-    private sequence: Sequence;
     private timeout: number;
+    private sequence: Sequence;
 
-    constructor(dealerSocket, options) {
+    constructor(dealerSocket, options: RequestOptions) {
         this.timeout = options.timeout || 5000;
-        this.sequence = 0;
         this.dealerSocket = dealerSocket;
         this.onResponseHandlers = new Map();
         this.awaitingResponseTimeouts = new Map();
         this.registerResponseHandler();
+        this.sequence = 0;
     }
 
     public makeForHook(name, to, beforeHook: Hook) {

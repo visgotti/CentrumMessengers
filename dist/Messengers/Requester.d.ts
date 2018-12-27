@@ -1,11 +1,11 @@
-import { Hook } from '../Centrum';
+import { RequestOptions, Hook } from '../Centrum';
 export declare class Requester {
     private dealerSocket;
     private onResponseHandlers;
     private awaitingResponseTimeouts;
-    private sequence;
     private timeout;
-    constructor(dealerSocket: any, options: any);
+    private sequence;
+    constructor(dealerSocket: any, options: RequestOptions);
     makeForHook(name: any, to: any, beforeHook: Hook): (...args: any[]) => Promise<{}>;
     makeForData(name: any, to: any): (data: any) => Promise<{}>;
     /**

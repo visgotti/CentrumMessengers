@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Requester {
     constructor(dealerSocket, options) {
         this.timeout = options.timeout || 5000;
-        this.sequence = 0;
         this.dealerSocket = dealerSocket;
         this.onResponseHandlers = new Map();
         this.awaitingResponseTimeouts = new Map();
         this.registerResponseHandler();
+        this.sequence = 0;
     }
     makeForHook(name, to, beforeHook) {
         return ((...args) => {
