@@ -50,7 +50,7 @@ class Centrum {
         if (options.publish) {
             this.publish = {};
             this.pubSocket = zmq.socket('pub');
-            this.pubSocket.bind(options.publish.pubSocketURI);
+            this.pubSocket.bindSync(options.publish.pubSocketURI);
             this.publisher = new Publisher_1.Publisher(this.pubSocket);
             this.createPublish = this._createPublish;
             this.removePublish = this._removePublish;
