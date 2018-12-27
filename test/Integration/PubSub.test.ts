@@ -47,13 +47,13 @@ describe('Publish to subscription communication', function() {
     beforeEach((done) => {
         setTimeout(() => {
             done();
-        }, 1700)
+        }, 200)
     });
 
     afterEach((done) => {
         setTimeout(() => {
             done();
-        }, 1700);
+        }, 200);
     });
 
     it('Sends publication to 1 subscriber', function(done) {
@@ -121,9 +121,8 @@ describe('Publish to subscription communication', function() {
                 console.log(sub2Expected)
             }
             done();
-        }, 1500);
+        }, 200);
     });
-
 
     it('Centrum.removePublish removes ability to call the publish', function(done) {
         pubServers[0].createPublish("foo2", function(bar, baz) {
@@ -176,7 +175,7 @@ describe('Publish to subscription communication', function() {
             assert.strictEqual(pub1Calls, expectedPub1Calls);
             assert.strictEqual(pub2Calls, expectedPub2Calls);
             done();
-        }, 500);
+        }, 200);
     });
 
     it('Centrum.removeSubscription stops instance from receiving published data', function(done) {
