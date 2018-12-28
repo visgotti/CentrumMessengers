@@ -150,12 +150,15 @@ export class Centrum {
     public close() {
         if(this.pubSocket) {
             this.pubSocket.close();
+            this.pubSocket = null;
         }
         if(this.subSocket) {
             this.subSocket.close();
+            this.subSocket = null;
         }
         if(this.dealerSocket) {
             this.dealerSocket.close();
+            this.dealerSocket = null;
         }
     }
 
