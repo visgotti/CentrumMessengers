@@ -53,7 +53,7 @@ describe('Publish to subscription communication', function() {
     afterEach((done) => {
         setTimeout(() => {
             done();
-        }, 200);
+        }, 500);
     });
 
     it('Sends publication to 1 subscriber', function(done) {
@@ -120,6 +120,27 @@ describe('Publish to subscription communication', function() {
             if(sub2Expected.length > 0) {
                 console.log(sub2Expected)
             }
+            done();
+        }, 200);
+    });
+
+    it('Executes the after handler correctly', function(done) {
+        let afterHandlerValue = 0;
+        pubServers[0].createPublish("afterTest", function(bar, baz) {
+            return bar * baz
+        }, function(data) {
+            afterHandlerValue = data + 5;
+        });
+
+        subServers[0].createSubscription("afterTest", function(data) {
+            assert.strictEqual(data, 10);
+        });
+
+        pubServers[0].publish.afterTest(2, 5);
+
+        setTimeout(() => {
+            // all sub1Expected and sub2Expected should have had the values filtered out
+            assert.strictEqual(afterHandlerValue, 15);
             done();
         }, 200);
     });

@@ -185,7 +185,7 @@ export class Centrum {
     public createResponse(name: string, beforeHook: Hook) { throw new Error('Server is not configured use responses.') }
     public removeResponse(name) { throw new Error('Server is not configured to use responses.')}
 
-    public createPublish(name: string, beforeHook?: Hook) { throw new Error('Server is not configured to publish.') }
+    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
     public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
@@ -208,11 +208,11 @@ export class Centrum {
         }
     }
 
-    private _createPublish(name: string, beforeHook?: Hook) {
+    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) {
         if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-        this.publish[name] = !beforeHook ? this.publisher.makeForData(name) : this.publisher.makeForHook(name, beforeHook);
+        this.publish[name] = this.publisher.make(name, beforeHook, afterHandler);
     }
 
     private _removePublish(name: string, beforeHook?: Hook) {

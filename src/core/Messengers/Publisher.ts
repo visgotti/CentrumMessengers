@@ -1,4 +1,4 @@
-import { Hook } from '../Centrum';
+import { Hook, Handler } from '../Centrum';
 
 export class Publisher {
     private pubSocket: any;
@@ -7,18 +7,43 @@ export class Publisher {
         this.pubSocket = pubSocket;
     }
 
-    public makeForHook(name, beforeHook: Hook) {
-        return ((...args) => {
-            const sendData = beforeHook(...args);
-            const encoded = JSON.stringify(sendData);
-            this.pubSocket.send([name, encoded]);
-        });
+    public make(name, beforeHook?: Hook, afterHandler?: Handler) {
+        if(beforeHook) {
+            return this.makeForBeforeHook(name, beforeHook, afterHandler);
+        } else {
+            return this.makeForData(name, afterHandler);
+        }
     }
 
-    public makeForData(name) {
-        return ((data) => {
-            const encoded = JSON.stringify(data);
-            this.pubSocket.send([name, encoded]);
-        });
+    private makeForData(name, afterHandler?: Handler) {
+        if(afterHandler) {
+            return ((data) => {
+                const encoded = JSON.stringify(data);
+                this.pubSocket.send([name, encoded]);
+                afterHandler(data)
+            });
+        } else {
+            return ((data) => {
+                const encoded = JSON.stringify(data);
+                this.pubSocket.send([name, encoded]);
+            });
+        }
+    }
+
+    private makeForBeforeHook(name, beforeHook: Hook, afterHandler?: Handler) {
+        if(afterHandler) {
+            return ((...args) => {
+                const sendData = beforeHook(...args);
+                const encoded = JSON.stringify(sendData);
+                this.pubSocket.send([name, encoded]);
+                afterHandler(sendData);
+            });
+        } else {
+            return ((...args) => {
+                const sendData = beforeHook(...args);
+                const encoded = JSON.stringify(sendData);
+                this.pubSocket.send([name, encoded]);
+            });
+        }
     }
 }
