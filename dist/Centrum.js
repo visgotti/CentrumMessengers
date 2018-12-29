@@ -101,7 +101,7 @@ class Centrum {
      */
     createResponse(name, beforeHook) { throw new Error('Server is not configured use responses.'); }
     removeResponse(name) { throw new Error('Server is not configured to use responses.'); }
-    createPublish(name, beforeHook) { throw new Error('Server is not configured to publish.'); }
+    createPublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
     removeSubscription(name) { throw new Error('Server is not configured to use subscriptions.'); }
@@ -121,11 +121,11 @@ class Centrum {
             throw new Error(`Subscription does not exist for name: ${name}`);
         }
     }
-    _createPublish(name, beforeHook) {
+    _createPublish(name, beforeHook, afterHandler) {
         if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-        this.publish[name] = !beforeHook ? this.publisher.makeForData(name) : this.publisher.makeForHook(name, beforeHook);
+        this.publish[name] = this.publisher.make(name, beforeHook, afterHandler);
     }
     _removePublish(name, beforeHook) {
         if (this.publish[name]) {
