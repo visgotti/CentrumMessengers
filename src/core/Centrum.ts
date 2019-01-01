@@ -215,7 +215,7 @@ export class Centrum {
         this.publish[name] = this.publisher.make(name, beforeHook, afterHandler);
     }
 
-    private _removePublish(name: string, beforeHook?: Hook) {
+    private _removePublish(name: string) {
         if(this.publish[name]) {
             delete this.publish[name];
         } else {
