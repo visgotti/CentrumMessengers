@@ -104,7 +104,7 @@ class Centrum {
     createPublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
-    removeSubscription(name) { throw new Error('Server is not configured to use subscriptions.'); }
+    removeSubscription(name, index) { throw new Error('Server is not configured to use subscriptions.'); }
     _createSubscription(name, handler) {
         if (this.subscriptions.has(name)) {
             throw new Error(`Duplicate subscription name: ${name}`);
@@ -112,10 +112,18 @@ class Centrum {
         this.subscriptions.add(name);
         this.subscriber.addHandler(name, handler);
     }
-    _removeSubscription(name) {
+    _removeSubscription(name, index) {
         if (this.subscriptions.has(name)) {
-            this.subscriber.removeHandler(name);
-            this.subscriptions.delete(name);
+            if (index) {
+                const handlersLeft = this.subscriber.removeHandler(name, index);
+                if (handlersLeft === 0) {
+                    this.subscriptions.delete(name);
+                }
+            }
+            else {
+                this.subscriber.removeAllHandlers(name);
+                this.subscriptions.delete(name);
+            }
         }
         else {
             throw new Error(`Subscription does not exist for name: ${name}`);
