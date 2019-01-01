@@ -189,7 +189,7 @@ export class Centrum {
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
     public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
-    public removeSubscription(name) { throw new Error('Server is not configured to use subscriptions.')}
+    public removeSubscription(name: string, index?: number) { throw new Error('Server is not configured to use subscriptions.')}
 
     private _createSubscription(name: string, handler: Handler) {
         if(this.subscriptions.has(name)) {
@@ -199,10 +199,17 @@ export class Centrum {
         this.subscriber.addHandler(name, handler);
     }
 
-    private _removeSubscription(name: string) {
+    private _removeSubscription(name: string, index?: number) {
         if(this.subscriptions.has(name)) {
-            this.subscriber.removeHandler(name);
-            this.subscriptions.delete(name);
+            if(index) {
+                const handlersLeft = this.subscriber.removeHandler(name, index);
+                if(handlersLeft === 0) {
+                    this.subscriptions.delete(name);
+                }
+            } else {
+                this.subscriber.removeAllHandlers(name);
+                this.subscriptions.delete(name);
+            }
         } else {
             throw new Error(`Subscription does not exist for name: ${name}`);
         }

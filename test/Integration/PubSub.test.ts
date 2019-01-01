@@ -226,4 +226,60 @@ describe('Publish to subscription communication', function() {
             done();
         }, 200);
     });
+
+    it('registers multiple handlers for a subscriber', function(done) {
+        let sub1Received = 0;
+
+        pubServers[0].createPublish("foo4");
+
+        subServers[0].createSubscription("foo4", (data) => {
+            sub1Received += data;
+        });
+
+        subServers[0].subscriber.addHandler("foo4", (data) => {
+            sub1Received -= data;
+        });
+
+        for(let i = 0; i < 10; i++) {
+            pubServers[0].publish.foo4(1);
+        }
+
+        setTimeout(() => {
+            assert.strictEqual(sub1Received, 0);
+            done();
+        }, 200);
+    });
+
+    it('registers multiple handlers for a subscriber then removes only 1', function(done) {
+        let sub1Received = 0;
+
+        pubServers[0].createPublish("foo5");
+
+        subServers[0].createSubscription("foo5", (data) => {
+            sub1Received += data;
+        });
+
+        subServers[0].subscriber.addHandler("foo5", (data) => {
+            sub1Received -= data;
+        });
+
+        for(let i = 0; i < 10; i++) {
+            pubServers[0].publish.foo5(1);
+        }
+
+        setTimeout(() => {
+            assert.strictEqual(sub1Received, 0);
+            subServers[0].subscriber.removeHandler("foo5", 1);
+            for(let i = 0; i < 10; i++) {
+                // now when we publish the subtract handler shouldnt be happening anymore
+                pubServers[0].publish.foo5(1);
+            }
+
+            setTimeout(() => {
+                assert.strictEqual(sub1Received, 10);
+                done();
+            }, 200);
+
+        }, 200);
+    });
 });

@@ -1,7 +1,7 @@
 import { Handler } from '../Centrum';
 export class Subscriber {
     private subSocket: any;
-    private onPublicationHandlers: Map<string, Function>;
+    private onPublicationHandlers: Map<string, Array<Function>>;
 
     constructor(subSocket) {
         this.subSocket = subSocket;
@@ -15,21 +15,44 @@ export class Subscriber {
      * @param handler - function used to process data
      */
     public addHandler(name, handler: Handler) {
-        this.onPublicationHandlers.set(name, handler);
-        this.subSocket.subscribe(name);
+        if(!(this.onPublicationHandlers.has(name))) {
+            this.onPublicationHandlers.set(name, []);
+            this.subSocket.subscribe(name);
+        }
+        const handlers = this.onPublicationHandlers.get(name);
+        handlers.push(handler);
     }
 
-    public removeHandler(name) {
+    public removeAllHandlers(name) {
         this.onPublicationHandlers.delete(name);
+    }
+
+    /**
+     * removes handler of a subscription at certain index
+     * returns how many handlers are left for subscription.
+     * @param name
+     * @param index
+     * @returns {number}
+     */
+    public removeHandler(name, index) : number {
+        const handlers = this.onPublicationHandlers.get(name);
+        if(index < handlers.length) {
+            handlers.splice(index, 1);
+            if(handlers.length === 0) {
+                this.onPublicationHandlers.delete(name);
+            }
+        }
+        return handlers.length;
     }
 
     private registerOnPublicationHandlers() {
         this.subSocket.on('message', (...args) => {
             const name = args[0].toString();
             const data = JSON.parse(args[1]);
-            const handler = this.onPublicationHandlers.get(name);
-            if(handler) {
-                handler(data);
+            const handlers = this.onPublicationHandlers.get(name);
+            if(!(handlers)) return;
+            for(let i = 0; i < handlers.length; i++) {
+                handlers[i](data);
             }
         });
     }
