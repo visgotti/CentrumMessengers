@@ -192,10 +192,9 @@ export class Centrum {
     public removeSubscription(name: string, index?: number) { throw new Error('Server is not configured to use subscriptions.')}
 
     private _createSubscription(name: string, handler: Handler) {
-        if(this.subscriptions.has(name)) {
-            throw new Error(`Duplicate subscription name: ${name}`);
+        if(!(this.subscriptions.has(name))) {
+            this.subscriptions.add(name);
         }
-        this.subscriptions.add(name);
         this.subscriber.addHandler(name, handler);
     }
 

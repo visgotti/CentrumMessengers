@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d8a098ec-7fbb-41ce-be50-584db6b1d9c2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Centrum.js" afterPath="$PROJECT_DIR$/dist/Centrum.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Centrum.ts" afterPath="$PROJECT_DIR$/src/core/Centrum.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -24,11 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3030">
-              <caret line="202" column="42" lean-forward="false" selection-start-line="202" selection-start-column="42" selection-end-line="202" selection-end-column="42" />
+            <state relative-caret-position="332">
+              <caret line="198" column="5" lean-forward="true" selection-start-line="198" selection-start-column="5" selection-end-line="198" selection-end-column="5" />
               <folding>
                 <element signature="e#1256#1307#0" expanded="true" />
               </folding>
@@ -90,13 +90,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Centrum.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Centrum.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="272">
-              <caret line="112" column="5" lean-forward="true" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
+              <caret line="112" column="45" lean-forward="false" selection-start-line="112" selection-start-column="45" selection-end-line="112" selection-end-column="45" />
               <folding>
-                <marker date="1546380256842" expanded="true" signature="7376:7382" ph="{...}" />
+                <marker date="1546380308843" expanded="true" signature="7438:7444" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -236,10 +236,10 @@
         <option value="$PROJECT_DIR$/src/core/Messengers/Requester.ts" />
         <option value="$PROJECT_DIR$/test/Unit/Publisher.test.ts" />
         <option value="$PROJECT_DIR$/src/core/Messengers/Publisher.ts" />
-        <option value="$PROJECT_DIR$/src/core/Centrum.ts" />
         <option value="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" />
         <option value="$PROJECT_DIR$/test/Integration/PubSub.test.ts" />
         <option value="$PROJECT_DIR$/dist/Centrum.js" />
+        <option value="$PROJECT_DIR$/src/core/Centrum.ts" />
       </list>
     </option>
   </component>
@@ -345,7 +345,33 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="dist" />
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="centrum" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="centrum" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Messengers" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -470,12 +496,12 @@
       <workItem from="1546372482327" duration="1500000" />
       <workItem from="1546373990581" duration="1315000" />
       <workItem from="1546379272834" duration="170000" />
-      <workItem from="1546380216062" duration="46000" />
+      <workItem from="1546380216062" duration="168000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="108493000" />
+    <option name="totallyTimeSpent" value="108615000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1667" y="24" width="1533" height="876" extended-state="6" />
@@ -740,22 +766,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
+    <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3030">
-          <caret line="202" column="42" lean-forward="false" selection-start-line="202" selection-start-column="42" selection-end-line="202" selection-end-column="42" />
+        <state relative-caret-position="272">
+          <caret line="112" column="45" lean-forward="false" selection-start-line="112" selection-start-column="45" selection-end-line="112" selection-end-column="45" />
           <folding>
-            <element signature="e#1256#1307#0" expanded="true" />
+            <marker date="1546380308843" expanded="true" signature="7438:7444" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
+    <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="112" column="5" lean-forward="true" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
+        <state relative-caret-position="332">
+          <caret line="198" column="5" lean-forward="true" selection-start-line="198" selection-start-column="5" selection-end-line="198" selection-end-column="5" />
           <folding>
-            <marker date="1546380256842" expanded="true" signature="7376:7382" ph="{...}" />
+            <element signature="e#1256#1307#0" expanded="true" />
           </folding>
         </state>
       </provider>
