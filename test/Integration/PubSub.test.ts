@@ -40,20 +40,20 @@ describe('Publish to subscription communication', function() {
             assert.strictEqual(pubServers.length, 2);
             assert.strictEqual(subServers.length, 2);
             done();
-        }, 200)
+        }, 10)
     });
 
     //TODO: figure out why I need to wait so long between each test for them to pass.
     beforeEach((done) => {
         setTimeout(() => {
             done();
-        }, 200)
+        }, 10)
     });
 
     afterEach((done) => {
         setTimeout(() => {
             done();
-        }, 500);
+        }, 10);
     });
 
     it('Sends publication to 1 subscriber', function(done) {
@@ -81,7 +81,7 @@ describe('Publish to subscription communication', function() {
             assert.strictEqual(sub1Correct, true);
             assert.strictEqual(sub2Correct, true);
             done();
-        }, 200);
+        }, 10);
     });
 
     it('Sends publication from both publishers to both subscribers', function(done) {
@@ -121,7 +121,7 @@ describe('Publish to subscription communication', function() {
                 console.log(sub2Expected)
             }
             done();
-        }, 200);
+        }, 10);
     });
 
     it('Executes the after handler correctly', function(done) {
@@ -142,7 +142,7 @@ describe('Publish to subscription communication', function() {
             // all sub1Expected and sub2Expected should have had the values filtered out
             assert.strictEqual(afterHandlerValue, 15);
             done();
-        }, 200);
+        }, 10);
     });
 
     it('Centrum.removePublish removes ability to call the publish', function(done) {
@@ -185,18 +185,19 @@ describe('Publish to subscription communication', function() {
 
         function checkPubCalls() {
             if(pub2Calls === 2 && removedPub2 === false) {
-                // removing pub2 and sending another publish with pub1
-                pubServers[1].removePublish("foo2");
-                assert.doesNotThrow(() => { pubServers[0].publish.foo2(2, 5) });
-                assert.throws(() => { pubServers[1].publish.foo2(2, 5, 2) });
-                removedPub2 = true;
+            // removing pub2 and sending another publish with pub1
+            pubServers[1].removePublish("foo2");
+            assert.doesNotThrow(() => { pubServers[0].publish.foo2(2, 5) });
+            assert.throws(() => { pubServers[1].publish.foo2(2, 5, 2) });
+            removedPub2 = true;
+
             }
         }
         setTimeout(() => {
             assert.strictEqual(pub1Calls, expectedPub1Calls);
             assert.strictEqual(pub2Calls, expectedPub2Calls);
             done();
-        }, 200);
+        }, 100);
     });
 
     it('Centrum.removeSubscription stops instance from receiving published data', function(done) {
@@ -217,14 +218,16 @@ describe('Publish to subscription communication', function() {
         });
 
         for(let i = 0; i < 10; i++) {
-            pubServers[0].publish.foo3(1);
+            setTimeout(() => {
+                pubServers[0].publish.foo3(1);
+            }, 0);
         }
 
         setTimeout(() => {
             assert.strictEqual(sub1Received, 5);
             assert.strictEqual(sub2Received, 10);
             done();
-        }, 200);
+        }, 10);
     });
 
     it('registers multiple handlers for a subscriber', function(done) {
@@ -247,7 +250,7 @@ describe('Publish to subscription communication', function() {
         setTimeout(() => {
             assert.strictEqual(sub1Received, 0);
             done();
-        }, 200);
+        }, 10);
     });
 
     it('registers multiple handlers for a subscriber then removes only 1', function(done) {
@@ -278,8 +281,33 @@ describe('Publish to subscription communication', function() {
             setTimeout(() => {
                 assert.strictEqual(sub1Received, 10);
                 done();
-            }, 200);
+            }, 10);
 
-        }, 200);
+        }, 10);
+    });
+
+    it('registers multiple names for a single handler', function(done) {
+        let received = 0;
+
+        pubServers[0].createPublish("foo6");
+        pubServers[0].createPublish("bar6");
+        pubServers[0].createPublish("baz6");
+
+        subServers[0].createSubscription(["foo6", "bar6", "baz6"], (data) => {
+            received += data;
+        });
+
+        for(let i = 0; i < 10; i++) {
+            setTimeout(() => {
+                pubServers[0].publish.foo6(1);
+                pubServers[0].publish.bar6(1);
+                pubServers[0].publish.baz6(1);
+            }, 0);
+        }
+
+        setTimeout(() => {
+            assert.strictEqual(received, 30);
+            done();
+        }, 10);
     });
 });
