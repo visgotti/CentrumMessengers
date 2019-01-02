@@ -188,35 +188,29 @@ export class Centrum {
     public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
-    public createSubscription(name: string | Array<string>, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
+    public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
     public removeSubscription(name: string, index?: number) { throw new Error('Server is not configured to use subscriptions.')}
 
-    private _createSubscription(name: string | Array<string>, handler: Handler) {
-        name = Array.isArray(name) ? name : [name];
-        for(let i = 0; i < name.length; i++) {
-            if(!(this.subscriptions.has(name[i]))) {
-                this.subscriptions.add(name[i]);
-                this.subscriber.addHandler(name[i], handler);
-            }
+    private _createSubscription(name: string, handler: Handler) {
+        if(!(this.subscriptions.has(name))) {
+            this.subscriptions.add(name);
+            this.subscriber.addHandler(name, handler);
         }
     }
 
-    private _removeSubscription(name: string | Array<string>, index?: number) {
-        name = Array.isArray(name) ? name : [name];
-        for(let i = 0; i < name.length; i++) {
-            if (this.subscriptions.has(name[i])) {
-                if (index) {
-                    const handlersLeft = this.subscriber.removeHandler(name[i], index);
-                    if (handlersLeft === 0) {
-                        this.subscriptions.delete(name[i]);
-                    }
-                } else {
-                    this.subscriber.removeAllHandlers(name[i]);
-                    this.subscriptions.delete(name[i]);
+    private _removeSubscription(name: string, index?: number) {
+        if (this.subscriptions.has(name)) {
+            if (index) {
+                const handlersLeft = this.subscriber.removeHandler(name, index);
+                if (handlersLeft === 0) {
+                    this.subscriptions.delete(name);
                 }
             } else {
-                throw new Error(`Subscription does not exist for name: ${name}`);
+                this.subscriber.removeAllHandlers(name);
+                this.subscriptions.delete(name);
             }
+        } else {
+            throw new Error(`Subscription does not exist for name: ${name}`);
         }
     }
 

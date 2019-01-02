@@ -286,28 +286,4 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('registers multiple names for a single handler', function(done) {
-        let received = 0;
-
-        pubServers[0].createPublish("foo6");
-        pubServers[0].createPublish("bar6");
-        pubServers[0].createPublish("baz6");
-
-        subServers[0].createSubscription(["foo6", "bar6", "baz6"], (data) => {
-            received += data;
-        });
-
-        for(let i = 0; i < 10; i++) {
-            setTimeout(() => {
-                pubServers[0].publish.foo6(1);
-                pubServers[0].publish.bar6(1);
-                pubServers[0].publish.baz6(1);
-            }, 0);
-        }
-
-        setTimeout(() => {
-            assert.strictEqual(received, 30);
-            done();
-        }, 10);
-    });
 });
