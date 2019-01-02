@@ -169,10 +169,11 @@ export class Centrum {
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.
      * @param beforeHook - Hook that's used if you want to process data before sending it,
+     * @returns Function - request function that sends out the request.
      * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
-    public createRequest(name: string, to: string, beforeHook?: Hook) { throw new Error('Server is not configured to use requests.') }
+    public createRequest(name: string, to: string, beforeHook?: Hook) : Function { throw new Error('Server is not configured to use requests.') }
     public removeRequest(name) { throw new Error('Server is not configured to use requests.')}
 
     /**
@@ -185,7 +186,13 @@ export class Centrum {
     public createResponse(name: string, beforeHook: Hook) { throw new Error('Server is not configured use responses.') }
     public removeResponse(name) { throw new Error('Server is not configured to use responses.')}
 
-    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) { throw new Error('Server is not configured to publish.') }
+    /**
+     *
+     * @param name - name for publish method
+     * @param beforeHook - hook that sends return value as message
+     * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     */
+    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
     public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
@@ -214,11 +221,13 @@ export class Centrum {
         }
     }
 
-    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) {
+    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function {
         if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-        this.publish[name] = this.publisher.make(name, beforeHook, afterHandler);
+        const publish = this.publisher.make(name, beforeHook, afterHandler);
+        this.publish[name] = publish;
+        return publish;
     }
 
     private _removePublish(name: string) {
@@ -229,11 +238,13 @@ export class Centrum {
         }
     }
 
-    private _createRequest(name: string, to: string, beforeHook?: Hook) {
+    private _createRequest(name: string, to: string, beforeHook?: Hook) : Function {
         if(this.requests[name]) {
             throw new Error(`Duplicate request name: ${name}`);
         }
-        this.requests[name] = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
+        const request = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
+        this.requests[name] = request;
+        return request;
     }
 
     private _removeRequest(name: string) {
