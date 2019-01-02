@@ -71,10 +71,11 @@ export declare class Centrum {
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.
      * @param beforeHook - Hook that's used if you want to process data before sending it,
+     * @returns Function - request function that sends out the request.
      * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
-    createRequest(name: string, to: string, beforeHook?: Hook): void;
+    createRequest(name: string, to: string, beforeHook?: Hook): Function;
     removeRequest(name: any): void;
     /**
      * If options.response was passed into constructor, you can use this function to create
@@ -85,7 +86,13 @@ export declare class Centrum {
      */
     createResponse(name: string, beforeHook: Hook): void;
     removeResponse(name: any): void;
-    createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler): void;
+    /**
+     *
+     * @param name - name for publish method
+     * @param beforeHook - hook that sends return value as message
+     * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     */
+    createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler): Function;
     removePublish(name: any): void;
     createSubscription(name: string, handler: Handler): void;
     removeSubscription(name: string, index?: number): void;

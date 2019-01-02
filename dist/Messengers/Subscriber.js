@@ -8,7 +8,7 @@ class Subscriber {
     }
     /**
      * Used when adding a handler for incoming requests.
-     * @param name - name of the request
+     * @param name - name or names we want to link to the handler.
      * @param handler - function used to process data
      */
     addHandler(name, handler) {
@@ -39,6 +39,7 @@ class Subscriber {
         }
         return handlers.length;
     }
+    //todo... make this become socket.on('name') instead maybe?
     registerOnPublicationHandlers() {
         this.subSocket.on('message', (...args) => {
             const name = args[0].toString();

@@ -5,7 +5,7 @@ export declare class Subscriber {
     constructor(subSocket: any);
     /**
      * Used when adding a handler for incoming requests.
-     * @param name - name of the request
+     * @param name - name or names we want to link to the handler.
      * @param handler - function used to process data
      */
     addHandler(name: any, handler: Handler): void;

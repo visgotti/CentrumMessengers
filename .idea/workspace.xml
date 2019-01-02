@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d8a098ec-7fbb-41ce-be50-584db6b1d9c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Centrum.ts" afterPath="$PROJECT_DIR$/src/core/Centrum.ts" />
-    </list>
+    <list default="true" id="d8a098ec-7fbb-41ce-be50-584db6b1d9c2" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -26,8 +24,8 @@
       <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="193" column="7" lean-forward="true" selection-start-line="193" selection-start-column="7" selection-end-line="193" selection-end-column="7" />
+            <state relative-caret-position="210">
+              <caret line="196" column="0" lean-forward="true" selection-start-line="196" selection-start-column="0" selection-end-line="196" selection-end-column="0" />
               <folding>
                 <element signature="e#1256#1307#0" expanded="true" />
               </folding>
@@ -513,12 +511,12 @@
       <workItem from="1546373990581" duration="1315000" />
       <workItem from="1546379272834" duration="170000" />
       <workItem from="1546380216062" duration="594000" />
-      <workItem from="1546407815993" duration="5574000" />
+      <workItem from="1546407815993" duration="5612000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="114615000" />
+    <option name="totallyTimeSpent" value="114653000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1667" y="24" width="1533" height="876" extended-state="6" />
@@ -797,8 +795,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="193" column="7" lean-forward="true" selection-start-line="193" selection-start-column="7" selection-end-line="193" selection-end-column="7" />
+        <state relative-caret-position="210">
+          <caret line="196" column="0" lean-forward="true" selection-start-line="196" selection-start-column="0" selection-end-line="196" selection-end-column="0" />
           <folding>
             <element signature="e#1256#1307#0" expanded="true" />
           </folding>

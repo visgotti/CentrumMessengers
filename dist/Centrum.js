@@ -87,6 +87,7 @@ class Centrum {
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.
      * @param beforeHook - Hook that's used if you want to process data before sending it,
+     * @returns Function - request function that sends out the request.
      * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
@@ -101,6 +102,12 @@ class Centrum {
      */
     createResponse(name, beforeHook) { throw new Error('Server is not configured use responses.'); }
     removeResponse(name) { throw new Error('Server is not configured to use responses.'); }
+    /**
+     *
+     * @param name - name for publish method
+     * @param beforeHook - hook that sends return value as message
+     * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     */
     createPublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
@@ -108,8 +115,8 @@ class Centrum {
     _createSubscription(name, handler) {
         if (!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
+            this.subscriber.addHandler(name, handler);
         }
-        this.subscriber.addHandler(name, handler);
     }
     _removeSubscription(name, index) {
         if (this.subscriptions.has(name)) {
@@ -132,7 +139,9 @@ class Centrum {
         if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-        this.publish[name] = this.publisher.make(name, beforeHook, afterHandler);
+        const publish = this.publisher.make(name, beforeHook, afterHandler);
+        this.publish[name] = publish;
+        return publish;
     }
     _removePublish(name) {
         if (this.publish[name]) {
@@ -146,7 +155,9 @@ class Centrum {
         if (this.requests[name]) {
             throw new Error(`Duplicate request name: ${name}`);
         }
-        this.requests[name] = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
+        const request = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
+        this.requests[name] = request;
+        return request;
     }
     _removeRequest(name) {
         if (this.requests[name]) {
