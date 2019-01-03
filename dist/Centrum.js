@@ -53,6 +53,7 @@ class Centrum {
             this.pubSocket.bindSync(options.publish.pubSocketURI);
             this.publisher = new Publisher_1.Publisher(this.pubSocket);
             this.createPublish = this._createPublish;
+            this.getOrCreatePublish = this._getOrCreatePublish;
             this.removePublish = this._removePublish;
         }
         if (options.subscribe) {
@@ -109,6 +110,15 @@ class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
     createPublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
+
+    /**
+     * if you're sharing a centrum instance between objects and want to reuse an already existing publish,
+     * you can use this and it will return the publisher if it exists and make it then return it if it doesnt.
+     * @param name
+     * @param beforeHook
+     * @param afterHandler
+     */
+    getOrCreatePublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
     removeSubscription(name, index) { throw new Error('Server is not configured to use subscriptions.'); }
@@ -138,6 +148,14 @@ class Centrum {
     _createPublish(name, beforeHook, afterHandler) {
         if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
+        }
+        const publish = this.publisher.make(name, beforeHook, afterHandler);
+        this.publish[name] = publish;
+        return publish;
+    }
+    _getOrCreatePublish(name, beforeHook, afterHandler) {
+        if (this.publish[name]) {
+            return this.publish[name];
         }
         const publish = this.publisher.make(name, beforeHook, afterHandler);
         this.publish[name] = publish;
