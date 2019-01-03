@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d8a098ec-7fbb-41ce-be50-584db6b1d9c2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Centrum.js" afterPath="$PROJECT_DIR$/dist/Centrum.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" afterPath="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Centrum.ts" afterPath="$PROJECT_DIR$/src/core/Centrum.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -24,11 +23,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="750">
-              <caret line="109" column="57" lean-forward="true" selection-start-line="109" selection-start-column="57" selection-end-line="109" selection-end-column="57" />
+            <state relative-caret-position="195">
+              <caret line="247" column="5" lean-forward="false" selection-start-line="247" selection-start-column="5" selection-end-line="247" selection-end-column="5" />
               <folding>
                 <element signature="e#1256#1307#0" expanded="true" />
               </folding>
@@ -90,13 +89,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Centrum.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Centrum.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="57" column="9" lean-forward="true" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
+            <state relative-caret-position="90">
+              <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
               <folding>
-                <marker date="1546543651031" expanded="true" signature="8579:8585" ph="{...}" />
+                <marker date="1546543692274" expanded="true" signature="7807:7813" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -238,9 +237,9 @@
         <option value="$PROJECT_DIR$/test/Unit/Publisher.test.ts" />
         <option value="$PROJECT_DIR$/src/core/Messengers/Publisher.ts" />
         <option value="$PROJECT_DIR$/test/Integration/PubSub.test.ts" />
-        <option value="$PROJECT_DIR$/src/core/Centrum.ts" />
         <option value="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" />
         <option value="$PROJECT_DIR$/dist/Centrum.js" />
+        <option value="$PROJECT_DIR$/src/core/Centrum.ts" />
       </list>
     </option>
   </component>
@@ -408,19 +407,19 @@
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/test/Unit" />
-      <recent name="$PROJECT_DIR$/src/core/Messengers" />
-      <recent name="$PROJECT_DIR$/test" />
-      <recent name="$PROJECT_DIR$/test/Messages/Unit" />
-      <recent name="$PROJECT_DIR$/test/Servers" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/dist" />
       <recent name="$PROJECT_DIR$/test/Messages/Request" />
       <recent name="$PROJECT_DIR$/test/Messages" />
       <recent name="$PROJECT_DIR$/src/core/Messengers/Response" />
       <recent name="$PROJECT_DIR$/src/core/Messages/Request" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test/Unit" />
+      <recent name="$PROJECT_DIR$/src/core/Messengers" />
+      <recent name="$PROJECT_DIR$/test" />
+      <recent name="$PROJECT_DIR$/test/Messages/Unit" />
+      <recent name="$PROJECT_DIR$/test/Servers" />
     </key>
   </component>
   <component name="RunManager">
@@ -512,12 +511,12 @@
       <workItem from="1546373990581" duration="1315000" />
       <workItem from="1546379272834" duration="170000" />
       <workItem from="1546380216062" duration="594000" />
-      <workItem from="1546407815993" duration="11240000" />
+      <workItem from="1546407815993" duration="11782000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="120281000" />
+    <option name="totallyTimeSpent" value="120823000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1667" y="24" width="1533" height="876" extended-state="6" />
@@ -750,16 +749,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="750">
-          <caret line="109" column="57" lean-forward="true" selection-start-line="109" selection-start-column="57" selection-end-line="109" selection-end-column="57" />
-          <folding>
-            <element signature="e#1256#1307#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Messengers/Responder.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
@@ -776,14 +765,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Broker.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="27" column="11" lean-forward="false" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Messengers/Publisher.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="145">
@@ -794,10 +775,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="57" column="9" lean-forward="true" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
+        <state relative-caret-position="90">
+          <caret line="33" column="30" lean-forward="true" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
           <folding>
-            <marker date="1546543651031" expanded="true" signature="8579:8585" ph="{...}" />
+            <marker date="1546543692274" expanded="true" signature="7807:7813" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Broker.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="332">
+          <caret line="27" column="11" lean-forward="false" selection-start-line="27" selection-start-column="11" selection-end-line="27" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="247" column="5" lean-forward="false" selection-start-line="247" selection-start-column="5" selection-end-line="247" selection-end-column="5" />
+          <folding>
+            <element signature="e#1256#1307#0" expanded="true" />
           </folding>
         </state>
       </provider>

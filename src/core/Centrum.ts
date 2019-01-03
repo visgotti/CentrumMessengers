@@ -131,6 +131,7 @@ export class Centrum {
             this.pubSocket = zmq.socket('pub');
             this.pubSocket.bindSync(options.publish.pubSocketURI);
             this.publisher = new Publisher(this.pubSocket);
+            this.getOrCreatePublish = this._getOrCreatePublish;
             this.createPublish = this._createPublish;
             this.removePublish = this._removePublish;
         }
@@ -193,6 +194,14 @@ export class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
     public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function { throw new Error('Server is not configured to publish.') }
+
+    /**
+     * does same thing as createPublish but if the publish name already exists it will return the handler.
+     * @param name - name for publish method
+     * @param beforeHook - hook that sends return value as message
+     * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     */
+    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
     public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
@@ -224,6 +233,14 @@ export class Centrum {
     private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function {
         if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
+        }
+        const publish = this.publisher.make(name, beforeHook, afterHandler);
+        this.publish[name] = publish;
+        return publish;
+    }
+    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function {
+        if(this.publish[name]) {
+            return this.publish[name];
         }
         const publish = this.publisher.make(name, beforeHook, afterHandler);
         this.publish[name] = publish;
