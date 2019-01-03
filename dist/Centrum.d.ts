@@ -93,12 +93,20 @@ export declare class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
     createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler): Function;
+    /**
+     * does same thing as createPublish but if the publish name already exists it will return the handler.
+     * @param name - name for publish method
+     * @param beforeHook - hook that sends return value as message
+     * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     */
+    getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler): Function;
     removePublish(name: any): void;
     createSubscription(name: string, handler: Handler): void;
     removeSubscription(name: string, index?: number): void;
     private _createSubscription;
     private _removeSubscription;
     private _createPublish;
+    private _getOrCreatePublish;
     private _removePublish;
     private _createRequest;
     private _removeRequest;

@@ -52,6 +52,7 @@ class Centrum {
             this.pubSocket = zmq.socket('pub');
             this.pubSocket.bindSync(options.publish.pubSocketURI);
             this.publisher = new Publisher_1.Publisher(this.pubSocket);
+            this.getOrCreatePublish = this._getOrCreatePublish;
             this.createPublish = this._createPublish;
             this.removePublish = this._removePublish;
         }
@@ -109,6 +110,13 @@ class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
     createPublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
+    /**
+     * does same thing as createPublish but if the publish name already exists it will return the handler.
+     * @param name - name for publish method
+     * @param beforeHook - hook that sends return value as message
+     * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     */
+    getOrCreatePublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
     removeSubscription(name, index) { throw new Error('Server is not configured to use subscriptions.'); }
@@ -138,6 +146,14 @@ class Centrum {
     _createPublish(name, beforeHook, afterHandler) {
         if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
+        }
+        const publish = this.publisher.make(name, beforeHook, afterHandler);
+        this.publish[name] = publish;
+        return publish;
+    }
+    _getOrCreatePublish(name, beforeHook, afterHandler) {
+        if (this.publish[name]) {
+            return this.publish[name];
         }
         const publish = this.publisher.make(name, beforeHook, afterHandler);
         this.publish[name] = publish;
