@@ -144,6 +144,7 @@ export class Centrum {
             this.subscriptions = new Set();
             this.subscriber = new Subscriber(this.subSocket);
             this.createSubscription = this._createSubscription;
+            this.createOrAddSubscription = this._createOrAddSubscription;
             this.removeSubscription = this._removeSubscription;
         }
     }
@@ -205,6 +206,8 @@ export class Centrum {
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
 
     public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
+    // used if you're not sure if the subscription exists but you want to add another handler to it.
+    public createOrAddSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
     public removeSubscription(name: string, index?: number) { throw new Error('Server is not configured to use subscriptions.')}
 
     private _createSubscription(name: string, handler: Handler) {
@@ -212,6 +215,13 @@ export class Centrum {
             this.subscriptions.add(name);
             this.subscriber.addHandler(name, handler);
         }
+    }
+
+    private _createOrAddSubscription(name: string, handler: Handler) {
+        if(!(this.subscriptions.has(name))) {
+            this.subscriptions.add(name);
+        }
+        this.subscriber.addHandler(name, handler);
     }
 
     private _removeSubscription(name: string, index?: number) {
@@ -238,6 +248,7 @@ export class Centrum {
         this.publish[name] = publish;
         return publish;
     }
+
     private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function {
         if(this.publish[name]) {
             return this.publish[name];
