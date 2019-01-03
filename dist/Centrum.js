@@ -55,6 +55,7 @@ class Centrum {
             this.getOrCreatePublish = this._getOrCreatePublish;
             this.createPublish = this._createPublish;
             this.removePublish = this._removePublish;
+            this.removeAllPublish = this._removeAlPublish;
         }
         if (options.subscribe) {
             this.subSocket = zmq.socket('sub');
@@ -66,14 +67,17 @@ class Centrum {
             this.createSubscription = this._createSubscription;
             this.createOrAddSubscription = this._createOrAddSubscription;
             this.removeSubscription = this._removeSubscription;
+            this.removeAllSubscriptions = this._removeAllSubscriptions;
         }
     }
     close() {
         if (this.pubSocket) {
+            this._removeAlPublish();
             this.pubSocket.close();
             this.pubSocket = null;
         }
         if (this.subSocket) {
+            this._removeAllSubscriptions();
             this.subSocket.close();
             this.subSocket = null;
         }
@@ -119,10 +123,12 @@ class Centrum {
      */
     getOrCreatePublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
+    removeAllPublish() { throw new Error('Server is not configured to publish.'); }
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
     // used if you're not sure if the subscription exists but you want to add another handler to it.
     createOrAddSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
     removeSubscription(name, index) { throw new Error('Server is not configured to use subscriptions.'); }
+    removeAllSubscriptions() { throw new Error('Server is not configured to use subscriptions.'); }
     _createSubscription(name, handler) {
         if (!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
@@ -152,6 +158,11 @@ class Centrum {
             throw new Error(`Subscription does not exist for name: ${name}`);
         }
     }
+    _removeAllSubscriptions() {
+        for (let subName of this.subscriptions.values()) {
+            this._removeSubscription(subName);
+        }
+    }
     _createPublish(name, beforeHook, afterHandler) {
         if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
@@ -175,6 +186,11 @@ class Centrum {
         else {
             throw new Error(`Publisher does not exist for name: ${name}`);
         }
+    }
+    _removeAlPublish() {
+        Object.keys(this.publish).forEach(pubName => {
+            this._removePublish(pubName);
+        });
     }
     _createRequest(name, to, beforeHook) {
         if (this.requests[name]) {
