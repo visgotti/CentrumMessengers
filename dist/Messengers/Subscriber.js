@@ -39,7 +39,6 @@ class Subscriber {
         }
         return handlers.length;
     }
-    //todo... make this become socket.on('name') instead maybe?
     registerOnPublicationHandlers() {
         this.subSocket.on('message', (...args) => {
             const name = args[0].toString();
