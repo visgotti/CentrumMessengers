@@ -3,13 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="d8a098ec-7fbb-41ce-be50-584db6b1d9c2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Centrum.d.ts" afterPath="$PROJECT_DIR$/dist/Centrum.d.ts" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Centrum.js" afterPath="$PROJECT_DIR$/dist/Centrum.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Messengers/Publisher.d.ts" afterPath="$PROJECT_DIR$/dist/Messengers/Publisher.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Messengers/Subscriber.d.ts" afterPath="$PROJECT_DIR$/dist/Messengers/Subscriber.d.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/Messengers/Subscriber.js" afterPath="$PROJECT_DIR$/dist/Messengers/Subscriber.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Centrum.ts" afterPath="$PROJECT_DIR$/src/core/Centrum.ts" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Messengers/Publisher.ts" afterPath="$PROJECT_DIR$/src/core/Messengers/Publisher.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" afterPath="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/Integration/PubSub.test.ts" afterPath="$PROJECT_DIR$/test/Integration/PubSub.test.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -30,13 +27,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Centrum.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="265">
-              <caret line="228" column="74" lean-forward="false" selection-start-line="228" selection-start-column="74" selection-end-line="228" selection-end-column="74" />
+            <state relative-caret-position="160">
+              <caret line="307" column="54" lean-forward="false" selection-start-line="307" selection-start-column="31" selection-end-line="307" selection-end-column="54" />
               <folding>
-                <element signature="e#1344#1395#0" expanded="true" />
+                <element signature="e#1417#1468#0" expanded="true" />
+                <marker date="1546713740751" expanded="true" signature="11917:13100" ph="..." />
+                <marker date="1546713740751" expanded="true" signature="13741:13817" ph="..." />
+                <marker date="1546713740751" expanded="true" signature="14108:14511" ph="..." />
               </folding>
             </state>
           </provider>
@@ -72,6 +72,18 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="PubSub.test.ts" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/Integration/PubSub.test.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="151">
+              <caret line="325" column="49" lean-forward="true" selection-start-line="325" selection-start-column="49" selection-end-line="325" selection-end-column="49" />
+              <folding>
+                <element signature="e#0#33#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Publisher.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/core/Messengers/Publisher.ts">
           <provider selected="true" editor-type-id="text-editor">
@@ -88,19 +100,6 @@
             <state relative-caret-position="240">
               <caret line="21" column="3" lean-forward="false" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Centrum.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="157" column="44" lean-forward="false" selection-start-line="157" selection-start-column="44" selection-end-line="157" selection-end-column="44" />
-              <folding>
-                <marker date="1546655643783" expanded="true" signature="2052:2452" ph="{...}" />
-                <marker date="1546655643783" expanded="true" signature="10064:10070" ph="{...}" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -125,30 +124,24 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="Subscriber.ts" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/core/Messengers/Subscriber.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="145">
+              <caret line="101" column="61" lean-forward="false" selection-start-line="101" selection-start-column="61" selection-end-line="101" selection-end-column="61" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>name</find>
-      <find>Req</find>
-      <find>publisher</find>
-      <find>length 1</find>
-      <find>foo4</find>
-      <find>subServers</find>
-      <find>this.publish</find>
-      <find>1500</find>
-      <find>bind</find>
-      <find>afterHook</find>
-      <find>subscriptions</find>
-      <find>removeSubscription</find>
-      <find>foo6</find>
-      <find>bar6</find>
-      <find>removePublish</find>
       <find>only</find>
       <find>publish</find>
       <find>createPublish</find>
       <find>create</find>
-      <find>createSubscription</find>
       <find>throws</find>
       <find>error</find>
       <find>gotMEs</find>
@@ -156,9 +149,25 @@
       <find>createSub</find>
       <find>remove</find>
       <find>SubscriptionHandler</find>
-      <find>createOrAdd</find>
       <find>foo2</find>
       <find>Handler</find>
+      <find>throw</find>
+      <find>id:</find>
+      <find>Al</find>
+      <find>createSubscription</find>
+      <find>_createOrAdd</find>
+      <find>createOrAdd</find>
+      <find>subscriptionHandlers</find>
+      <find>handlerIdToNames</find>
+      <find>handlerIdToName</find>
+      <find>handlerIdToNamess</find>
+      <find>addHandler</find>
+      <find>removeAllSubscrip</find>
+      <find>this.subscriber.removeAll</find>
+      <find>removeSubscriptionById</find>
+      <find>Subscription</find>
+      <find>removeAllSubscriptionsWithId</find>
+      <find>removeHandlerById</find>
     </findStrings>
     <replaceStrings>
       <replace>Back</replace>
@@ -175,6 +184,8 @@
       <replace>foo</replace>
       <replace>afterHandler</replace>
       <replace>10</replace>
+      <replace>handlerIdToNames</replace>
+      <replace>id: string</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -229,11 +240,11 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/core/Messengers/Requester.ts" />
         <option value="$PROJECT_DIR$/test/Unit/Publisher.test.ts" />
-        <option value="$PROJECT_DIR$/dist/Centrum.js" />
-        <option value="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" />
-        <option value="$PROJECT_DIR$/test/Integration/PubSub.test.ts" />
         <option value="$PROJECT_DIR$/src/core/Messengers/Publisher.ts" />
+        <option value="$PROJECT_DIR$/dist/Centrum.js" />
+        <option value="$PROJECT_DIR$/test/Integration/PubSub.test.ts" />
         <option value="$PROJECT_DIR$/src/core/Centrum.ts" />
+        <option value="$PROJECT_DIR$/src/core/Messengers/Subscriber.ts" />
       </list>
     </option>
   </component>
@@ -494,12 +505,12 @@
       <workItem from="1546380216062" duration="594000" />
       <workItem from="1546407815993" duration="12734000" />
       <workItem from="1546549335647" duration="2739000" />
-      <workItem from="1546620499636" duration="11369000" />
+      <workItem from="1546620499636" duration="19854000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="135883000" />
+    <option name="totallyTimeSpent" value="144368000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1667" y="24" width="1533" height="876" extended-state="6" />
@@ -694,14 +705,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/Unit/Responder.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="21" column="3" lean-forward="false" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Messengers/Requester.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -734,35 +737,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/Integration/PubSub.test.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1315">
-          <caret line="135" column="41" lean-forward="true" selection-start-line="135" selection-start-column="41" selection-end-line="135" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/core/Messengers/Subscriber.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="33" column="7" lean-forward="true" selection-start-line="33" selection-start-column="7" selection-end-line="33" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="645">
-          <caret line="157" column="44" lean-forward="false" selection-start-line="157" selection-start-column="44" selection-end-line="157" selection-end-column="44" />
-          <folding>
-            <marker date="1546655643783" expanded="true" signature="2052:2452" ph="{...}" />
-            <marker date="1546655643783" expanded="true" signature="10064:10070" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Messengers/Publisher.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="151">
@@ -771,13 +745,53 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/dist/Centrum.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="148" column="48" lean-forward="false" selection-start-line="148" selection-start-column="41" selection-end-line="148" selection-end-column="48" />
+          <folding>
+            <marker date="1546658501503" expanded="true" signature="2052:2452" ph="{...}" />
+            <marker date="1546658501503" expanded="true" signature="10231:10237" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/Unit/Responder.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="21" column="3" lean-forward="false" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/Integration/PubSub.test.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="151">
+          <caret line="325" column="49" lean-forward="true" selection-start-line="325" selection-start-column="49" selection-end-line="325" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/core/Centrum.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="228" column="74" lean-forward="false" selection-start-line="228" selection-start-column="74" selection-end-line="228" selection-end-column="74" />
+        <state relative-caret-position="160">
+          <caret line="307" column="54" lean-forward="false" selection-start-line="307" selection-start-column="31" selection-end-line="307" selection-end-column="54" />
           <folding>
-            <element signature="e#1344#1395#0" expanded="true" />
+            <element signature="e#1417#1468#0" expanded="true" />
+            <marker date="1546713740751" expanded="true" signature="11917:13100" ph="..." />
+            <marker date="1546713740751" expanded="true" signature="13741:13817" ph="..." />
+            <marker date="1546713740751" expanded="true" signature="14108:14511" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/core/Messengers/Subscriber.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="101" column="61" lean-forward="false" selection-start-line="101" selection-start-column="61" selection-end-line="101" selection-end-column="61" />
+          <folding />
         </state>
       </provider>
     </entry>

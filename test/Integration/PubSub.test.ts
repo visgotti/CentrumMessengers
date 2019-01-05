@@ -64,14 +64,14 @@ describe('Publish to subscription communication', function() {
             return bar * baz
         });
 
-        subServers[0].createSubscription("foo", function(data) {
+        subServers[0].createSubscription("foo", 'foo', function(data) {
             assert.strictEqual(data, 10);
             if(data === 10) {
                 sub1Correct = true;
             }
         });
 
-        subServers[1].createSubscription("_foo", function(data) {
+        subServers[1].createSubscription("_foo", '_foo', function(data) {
             sub2Correct = false;
         });
 
@@ -96,11 +96,11 @@ describe('Publish to subscription communication', function() {
         let sub1Expected = [10, 12, 20, 30, 40];
         let sub2Expected = [10, 12, 20, 30, 40];
 
-        subServers[0].createSubscription("foo1", function(data) {
+        subServers[0].createSubscription("foo1", "foo1", function(data) {
             sub1Expected = sub1Expected.filter(val =>  val !== data);
         });
 
-        subServers[1].createSubscription("foo1", function(data) {
+        subServers[1].createSubscription("foo1", "foo1", function(data) {
             sub2Expected = sub2Expected.filter(val => val !== data);
         });
 
@@ -132,7 +132,7 @@ describe('Publish to subscription communication', function() {
             afterHandlerValue = data + 5;
         });
 
-        subServers[0].createSubscription("afterTest", function(data) {
+        subServers[0].createSubscription("afterTest", "afterTest", function(data) {
             assert.strictEqual(data, 10);
         });
 
@@ -157,7 +157,7 @@ describe('Publish to subscription communication', function() {
         let expectedPub2Calls = 2;
         let removedPub2 = false;
 
-        subServers[0].createSubscription("foo2", function(data) {
+        subServers[0].createSubscription("foo2", "foo2", function(data) {
             if(data === 10) {
                 // was pub1
                 pub1Calls++;
@@ -169,7 +169,7 @@ describe('Publish to subscription communication', function() {
             checkPubCalls();
         });
 
-        subServers[1].createSubscription("foo2", function(data) {
+        subServers[1].createSubscription("foo2", "foo2", function(data) {
             if(data === 10) {
                 pub1Calls++;
             } else if (data === 20) {
@@ -206,14 +206,14 @@ describe('Publish to subscription communication', function() {
 
         pubServers[0].createPublish("foo3");
 
-        subServers[0].createSubscription("foo3", (data) => {
+        subServers[0].createSubscription("foo3", "foo3", (data) => {
             sub1Received += data;
             if(sub1Received === 5) {
                 subServers[0].removeAllSubscriptionsWithName("foo3");
             }
         });
 
-        subServers[1].createSubscription("foo3", (data) => {
+        subServers[1].createSubscription("foo3", "foo3", (data) => {
             sub2Received += data;
         });
 
@@ -235,19 +235,19 @@ describe('Publish to subscription communication', function() {
 
         pubServers[0].createPublish("foo4");
 
-        subServers[0].createSubscription("foo4", (data) => {
+        subServers[0].createSubscription("foo4", "foo4-1", (data) => {
             sub1Received += data;
         });
 
-        subServers[0].createOrAddSubscription("foo4", (data) => {
+        subServers[0].createOrAddSubscription("foo4", "foo4-2", (data) => {
             sub1Received += data;
         });
 
-        subServers[0].subscriber.addHandler("foo4", (data) => {
+        subServers[0].createOrAddSubscription("foo4", "foo4-3", (data) => {
             sub1Received -= data;
         });
 
-        subServers[0].createOrAddSubscription("foo4", (data) => {
+        subServers[0].createOrAddSubscription("foo4", "foo4-4", (data) => {
             sub1Received -= data;
         });
 
@@ -266,12 +266,13 @@ describe('Publish to subscription communication', function() {
 
         pubServers[0].createPublish("foo5");
 
-        subServers[0].createSubscription("foo5", (data) => {
+        subServers[0].createSubscription("foo5", "foo5-1", (data) => {
             sub1Received += data;
         });
 
         // save id of subscription handler that subtracts from the received data.
-        const id = subServers[0].subscriber.addHandler("foo5", (data) => {
+        const id = "foo5-2";
+        subServers[0].createOrAddSubscription("foo5", id, (data) => {
             sub1Received -= data;
         });
 
@@ -281,7 +282,7 @@ describe('Publish to subscription communication', function() {
 
         setTimeout(() => {
             assert.strictEqual(sub1Received, 0);
-            const handlersLeft = subServers[0].removeSubscriptionById(id);
+            const handlersLeft = subServers[0].removeSubscriptionById(id, "foo5");
             assert.strictEqual(handlersLeft, 1);
             for(let i = 0; i < 10; i++) {
                 // now when we publish the subtract handler shouldnt be happening anymore
@@ -290,6 +291,48 @@ describe('Publish to subscription communication', function() {
 
             setTimeout(() => {
                 assert.strictEqual(sub1Received, 10);
+                done();
+            }, 10);
+
+        }, 10);
+    });
+
+    it('centrum.removeAllSubscriptionsWithId removes all subscriptions with the id', function(done) {
+        let sub1Received = 0;
+
+        const id = "id-1";
+
+        pubServers[0].createPublish("foo6");
+        pubServers[0].createPublish("foo7");
+
+        subServers[0].createSubscription("foo6", id, (data) => {
+            sub1Received += data;
+        });
+
+        subServers[0].createOrAddSubscription("foo7", id, (data) => {
+            sub1Received -= data;
+        });
+
+        subServers[0].createOrAddSubscription("foo7", "different_id", (data) => {
+            sub1Received += data;
+        });
+
+        for(let i = 0; i < 10; i++) {
+            pubServers[0].publish.foo6(1);
+            pubServers[0].publish.foo7(1);
+        }
+
+        setTimeout(() => {
+            assert.strictEqual(sub1Received, 10);
+            const handlersRemoved = subServers[0].removeAllSubscriptionsWithId(id);
+            assert.strictEqual(handlersRemoved, 2);
+            for(let i = 0; i < 10; i++) {
+                // now when we publish the subtract handler shouldnt be happening anymore
+                pubServers[0].publish.foo7(1);
+            }
+
+            setTimeout(() => {
+                assert.strictEqual(sub1Received, 20);
                 done();
             }, 10);
 

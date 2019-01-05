@@ -2,7 +2,7 @@ export declare type Hook = (...args: any[]) => any;
 export declare type Handler<T> = (data: any) => void;
 export interface SubscriptionHandler {
     (data: any): Handler<Function>;
-    id: number;
+    id: string;
 }
 export declare type Sequence = number;
 export interface REQUEST_MESSAGE {
@@ -40,6 +40,10 @@ export interface CentrumOptions {
     response?: boolean;
     publish?: PublishOptions;
     subscribe?: SubscribeOptions;
+}
+declare enum CREATED_OR_ADDED {
+    CREATED = "CREATED",
+    ADDED = "ADDED"
 }
 import { Requester } from './Messengers/Requester';
 export declare class Centrum {
@@ -109,35 +113,61 @@ export declare class Centrum {
     /**
      * creates a new subscription and subscription handler to process data when receiving a publication. Throws error if handler already exists.
      * @param name - name of publication to subscribe to.
+     * @param id - identifier for handler to run on publication
      * @param handler - method that takes in publication data as parameter when received.
-     * @returns number - id of handler (used to remove subscription later if needed)
+     * @returns boolean - returns true if it was successful.
      */
-    createSubscription(name: string, handler: Handler<Function>): number;
+    createSubscription(name: string, id: string, handler: Handler<Function>): boolean;
     /**
      * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
      * @param name - name of publication to subscribe to.
+     * @param id - identifier for handler to run on publication
      * @param handler - method that takes in publication data as parameter when received.
-     * @returns number - id of handler added (used to remove subscription later if needed)
+     * @returns CREATED_OR_ADDED - enum value to signify if you created new subscription or added new handler to existing subscription.
      */
-    createOrAddSubscription(name: string, handler: Handler<Function>): number;
+    createOrAddSubscription(name: string, id: string, handler: Handler<Function>): CREATED_OR_ADDED;
     /**
      * removes specific subscription by id
      * @param id - id of subscription that gets returned on creation.
+     * @param name - name of subscription that gets returned on creation.
+     * @returns - number of subscriptions removed.
      */
-    removeSubscriptionById(id: number): number | boolean;
+    removeSubscriptionById(id: string, name: string): number;
+    /**
+     * removes all handlers for all subscriptions that have the given id.
+     * @param id - id used to identify handlers for different subscription names.
+     * @returns number - ammount of handlers removed.
+     */
+    removeAllSubscriptionsWithId(id: string): number;
     removeAllSubscriptionsWithName(name: string): void;
     removeAllSubscriptions(): void;
+    /**
+     * returns all ids that have a handler registered for name.
+     * @param name
+     * @returns array
+     */
+    getHandlerIdsForSubscriptionName(name: string): void;
+    /**
+     * returns all subscription names that a handler id is waiting for.
+     * @param id
+     * @returns array
+     */
+    getSubscriptionNamesForHandlerId(id: string): void;
     private _createSubscription;
     private _createOrAddSubscription;
     private _removeSubscriptionById;
+    private _removeAllSubscriptionsWithId;
     private _removeAllSubscriptionsWithName;
     private _removeAllSubscriptions;
+    private _getHandlerIdsForSubscriptionName;
+    private _getSubscriptionNamesForHandlerId;
     private _createPublish;
     private _getOrCreatePublish;
     private _removePublish;
-    private _removeAlPublish;
+    private _removeAllPublish;
     private _createRequest;
     private _removeRequest;
     private _createResponse;
     private _removeResponse;
 }
+export {};
