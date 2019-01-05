@@ -135,7 +135,7 @@ class Centrum {
             this.subscriber.addHandler(name, handler);
         }
     }
-    _createOrAddSubscription(name, handler) {
+    _createOrAddSubscription(name, handler)  {
         if (!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
         }

@@ -11,7 +11,8 @@ export type Hook = (...args: any[]) => any;
     received from a server but does not worry about
     sending data anywhere after that implicitly.
  */
-export type Handler = (data: any) => void;
+export type Handler<T> = (data: any) => void;
+export interface SubscriptionHandler { (data: any): Handler<any>; id: number; }
 
 export type Sequence = number;
 
@@ -146,7 +147,8 @@ export class Centrum {
             this.subscriber = new Subscriber(this.subSocket);
             this.createSubscription = this._createSubscription;
             this.createOrAddSubscription = this._createOrAddSubscription;
-            this.removeSubscription = this._removeSubscription;
+            this.removeSubscriptionById = this._removeSubscriptionById;
+            this.removeAllSubscriptionsWithName = this._removeAllSubscriptionsWithName;
             this.removeAllSubscriptions = this._removeAllSubscriptions;
         }
     }
@@ -198,7 +200,7 @@ export class Centrum {
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
-    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function { throw new Error('Server is not configured to publish.') }
+    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function { throw new Error('Server is not configured to publish.') }
 
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
@@ -206,41 +208,65 @@ export class Centrum {
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
-    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function { throw new Error('Server is not configured to publish.') }
+    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
     public removeAllPublish() { throw new Error('Server is not configured to publish.')}
 
-    public createSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
-    // used if you're not sure if the subscription exists but you want to add another handler to it.
-    public createOrAddSubscription(name: string, handler: Handler) { throw new Error('Server is not configured to use subscriptions.') }
-    public removeSubscription(name: string, index?: number) { throw new Error('Server is not configured to use subscriptions.')}
+    /**
+     * creates a new subscription and subscription handler to process data when receiving a publication. Throws error if handler already exists.
+     * @param name - name of publication to subscribe to.
+     * @param handler - method that takes in publication data as parameter when received.
+     * @returns number - id of handler (used to remove subscription later if needed)
+     */
+    public createSubscription(name: string, handler: Handler<any>) : number { throw new Error('Server is not configured to use subscriptions.') }
+
+    /**
+     * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
+     * @param name - name of publication to subscribe to.
+     * @param handler - method that takes in publication data as parameter when received.
+     * @returns number - id of handler added (used to remove subscription later if needed)
+     */
+    public createOrAddSubscription(name: string, handler: Handler<any>) : number { throw new Error('Server is not configured to use subscriptions.') }
+
+    /**
+     * removes specific subscription by id
+     * @param id - id of subscription that gets returned on creation.
+     */
+    public removeSubscriptionById(id: number) : number | boolean { throw new Error('Server is not configured to use subscriptions.')}
+    public removeAllSubscriptionsWithName(name: string) { throw new Error('Server is not configured to use subscriptions.')}
     public removeAllSubscriptions() { throw new Error('Server is not configured to use subscriptions.')}
 
-    private _createSubscription(name: string, handler: Handler) {
+    private _createSubscription(name: string, handler: Handler<any>) {
         if(!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
-            this.subscriber.addHandler(name, handler);
+            return this.subscriber.addHandler(name, handler);
+        } else {
+            throw new Error(`Subscription already has a handler for name: ${name}. If you want to add multiple handlers use createOrAddSubscription or the addHandler method directly on your subscription object.`);
         }
     }
 
-    private _createOrAddSubscription(name: string, handler: Handler) {
+    private _createOrAddSubscription(name: string, handler: Handler<any>) {
         if(!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
         }
-        this.subscriber.addHandler(name, handler);
+        return this.subscriber.addHandler(name, handler);
     }
 
-    private _removeSubscription(name: string, index?: number) {
+    private _removeSubscriptionById(id: number) : number | boolean {
+        const removed = this.subscriber.removeHandlerById(id);
+        if(!(removed.success)) return false;
+
+        if(removed.handlersLeft === 0) {
+            this.subscriptions.delete(removed.name);
+        }
+        return removed.handlersLeft;
+    }
+
+    private _removeAllSubscriptionsWithName(name: string) : boolean {
         if (this.subscriptions.has(name)) {
-            if (index) {
-                const handlersLeft = this.subscriber.removeHandler(name, index);
-                if (handlersLeft === 0) {
-                    this.subscriptions.delete(name);
-                }
-            } else {
-                this.subscriber.removeAllHandlers(name);
-                this.subscriptions.delete(name);
-            }
+            this.subscriber.removeAllHandlersWithName(name);
+            this.subscriptions.delete(name);
+            return true;
         } else {
             throw new Error(`Subscription does not exist for name: ${name}`);
         }
@@ -248,11 +274,11 @@ export class Centrum {
 
     private _removeAllSubscriptions() {
         for(let subName of this.subscriptions.values()) {
-            this._removeSubscription(subName);
+            this._removeAllSubscriptionsWithName(subName);
         }
     }
 
-    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function {
+    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function {
         if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
@@ -261,7 +287,7 @@ export class Centrum {
         return publish;
     }
 
-    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler) : Function {
+    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function {
         if(this.publish[name]) {
             return this.publish[name];
         }

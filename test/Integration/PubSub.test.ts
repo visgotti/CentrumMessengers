@@ -183,16 +183,16 @@ describe('Publish to subscription communication', function() {
         pubServers[0].publish.foo2(2, 5);
         pubServers[1].publish.foo2(2, 5, 2);
 
-        function checkPubCalls() {
+        const checkPubCalls = () => {
             if(pub2Calls === 2 && removedPub2 === false) {
             // removing pub2 and sending another publish with pub1
-            pubServers[1].removePublish("foo2");
-            assert.doesNotThrow(() => { pubServers[0].publish.foo2(2, 5) });
-            assert.throws(() => { pubServers[1].publish.foo2(2, 5, 2) });
-            removedPub2 = true;
-
+                pubServers[1].removePublish("foo2");
+                pubServers[0].publish.foo2(2, 5);
+                assert.throws(() => { pubServers[1].publish.foo2(2, 5, 2) });
+                removedPub2 = true;
             }
-        }
+        };
+
         setTimeout(() => {
             assert.strictEqual(pub1Calls, expectedPub1Calls);
             assert.strictEqual(pub2Calls, expectedPub2Calls);
@@ -200,7 +200,7 @@ describe('Publish to subscription communication', function() {
         }, 100);
     });
 
-    it('Centrum.removeSubscription stops instance from receiving published data', function(done) {
+    it('Centrum.removeAllSubscriptionsWithName stops all instances with name foo3 from receiving published data', function(done) {
         let sub1Received = 0;
         let sub2Received = 0;
 
@@ -209,7 +209,7 @@ describe('Publish to subscription communication', function() {
         subServers[0].createSubscription("foo3", (data) => {
             sub1Received += data;
             if(sub1Received === 5) {
-                subServers[0].removeSubscription("foo3");
+                subServers[0].removeAllSubscriptionsWithName("foo3");
             }
         });
 
@@ -230,7 +230,7 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('registers multiple handlers for a subscriber', function(done) {
+    it('centrum.subscriber.addHandler and centrum.addOrCreateSubscription both register multiple handlers for a subscriber', function(done) {
         let sub1Received = 0;
 
         pubServers[0].createPublish("foo4");
@@ -239,7 +239,15 @@ describe('Publish to subscription communication', function() {
             sub1Received += data;
         });
 
+        subServers[0].createOrAddSubscription("foo4", (data) => {
+            sub1Received += data;
+        });
+
         subServers[0].subscriber.addHandler("foo4", (data) => {
+            sub1Received -= data;
+        });
+
+        subServers[0].createOrAddSubscription("foo4", (data) => {
             sub1Received -= data;
         });
 
@@ -253,7 +261,7 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('registers multiple handlers for a subscriber then removes only 1', function(done) {
+    it('centrum.removeSubscriptionById removes only 1', function(done) {
         let sub1Received = 0;
 
         pubServers[0].createPublish("foo5");
@@ -262,7 +270,8 @@ describe('Publish to subscription communication', function() {
             sub1Received += data;
         });
 
-        subServers[0].subscriber.addHandler("foo5", (data) => {
+        // save id of subscription handler that subtracts from the received data.
+        const id = subServers[0].subscriber.addHandler("foo5", (data) => {
             sub1Received -= data;
         });
 
@@ -272,7 +281,8 @@ describe('Publish to subscription communication', function() {
 
         setTimeout(() => {
             assert.strictEqual(sub1Received, 0);
-            subServers[0].subscriber.removeHandler("foo5", 1);
+            const handlersLeft = subServers[0].removeSubscriptionById(id);
+            assert.strictEqual(handlersLeft, 1);
             for(let i = 0; i < 10; i++) {
                 // now when we publish the subtract handler shouldnt be happening anymore
                 pubServers[0].publish.foo5(1);
