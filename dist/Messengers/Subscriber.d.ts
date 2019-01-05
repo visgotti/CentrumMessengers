@@ -1,22 +1,31 @@
-import { Handler } from '../Centrum';
+import { SubscriptionHandler } from '../Centrum';
 export declare class Subscriber {
     private subSocket;
-    private onPublicationHandlers;
+    private subscriptionHandlers;
+    private idToHandlerLookup;
+    private idsAssigned;
     constructor(subSocket: any);
     /**
      * Used when adding a handler for incoming requests.
      * @param name - name or names we want to link to the handler.
      * @param handler - function used to process data
+     * @returns number - returns id of handler used for removing specific one.
      */
-    addHandler(name: any, handler: Handler): void;
-    removeAllHandlers(name: any): void;
+    addHandler(name: any, handler: SubscriptionHandler): number;
+    /**
+     * Removes all handlers with name
+     * @param name
+     */
+    removeAllHandlersWithName(name: any): void;
     /**
      * removes handler of a subscription at certain index
-     * returns how many handlers are left for subscription.
-     * @param name
-     * @param index
-     * @returns {number}
+     * @param id
+     * @returns { success: boolean, name: string, handlersLeft: number } data about removed handler.
      */
-    removeHandler(name: any, index: any): number;
+    removeHandlerById(id: any): {
+        success: boolean;
+        name?: string;
+        handlersLeft?: number;
+    };
     private registerOnPublicationHandlers;
 }

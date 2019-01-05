@@ -66,7 +66,8 @@ class Centrum {
             this.subscriber = new Subscriber_1.Subscriber(this.subSocket);
             this.createSubscription = this._createSubscription;
             this.createOrAddSubscription = this._createOrAddSubscription;
-            this.removeSubscription = this._removeSubscription;
+            this.removeSubscriptionById = this._removeSubscriptionById;
+            this.removeAllSubscriptionsWithName = this._removeAllSubscriptionsWithName;
             this.removeAllSubscriptions = this._removeAllSubscriptions;
         }
     }
@@ -124,35 +125,56 @@ class Centrum {
     getOrCreatePublish(name, beforeHook, afterHandler) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     removeAllPublish() { throw new Error('Server is not configured to publish.'); }
+    /**
+     * creates a new subscription and subscription handler to process data when receiving a publication. Throws error if handler already exists.
+     * @param name - name of publication to subscribe to.
+     * @param handler - method that takes in publication data as parameter when received.
+     * @returns number - id of handler (used to remove subscription later if needed)
+     */
     createSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
-    // used if you're not sure if the subscription exists but you want to add another handler to it.
+    /**
+     * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
+     * @param name - name of publication to subscribe to.
+     * @param handler - method that takes in publication data as parameter when received.
+     * @returns number - id of handler added (used to remove subscription later if needed)
+     */
     createOrAddSubscription(name, handler) { throw new Error('Server is not configured to use subscriptions.'); }
-    removeSubscription(name, index) { throw new Error('Server is not configured to use subscriptions.'); }
+    /**
+     * removes specific subscription by id
+     * @param id - id of subscription that gets returned on creation.
+     */
+    removeSubscriptionById(id) { throw new Error('Server is not configured to use subscriptions.'); }
+    removeAllSubscriptionsWithName(name) { throw new Error('Server is not configured to use subscriptions.'); }
     removeAllSubscriptions() { throw new Error('Server is not configured to use subscriptions.'); }
     _createSubscription(name, handler) {
         if (!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
-            this.subscriber.addHandler(name, handler);
+            return this.subscriber.addHandler(name, handler);
+        }
+        else {
+            throw new Error(`Subscription already has a handler for name: ${name}. If you want to add multiple handlers use createOrAddSubscription or the addHandler method directly on your subscription object.`);
         }
     }
-    _createOrAddSubscription(name, handler)  {
+    _createOrAddSubscription(name, handler) {
         if (!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
         }
-        this.subscriber.addHandler(name, handler);
+        return this.subscriber.addHandler(name, handler);
     }
-    _removeSubscription(name, index) {
+    _removeSubscriptionById(id) {
+        const removed = this.subscriber.removeHandlerById(id);
+        if (!(removed.success))
+            return false;
+        if (removed.handlersLeft === 0) {
+            this.subscriptions.delete(removed.name);
+        }
+        return removed.handlersLeft;
+    }
+    _removeAllSubscriptionsWithName(name) {
         if (this.subscriptions.has(name)) {
-            if (index) {
-                const handlersLeft = this.subscriber.removeHandler(name, index);
-                if (handlersLeft === 0) {
-                    this.subscriptions.delete(name);
-                }
-            }
-            else {
-                this.subscriber.removeAllHandlers(name);
-                this.subscriptions.delete(name);
-            }
+            this.subscriber.removeAllHandlersWithName(name);
+            this.subscriptions.delete(name);
+            return true;
         }
         else {
             throw new Error(`Subscription does not exist for name: ${name}`);
@@ -160,7 +182,7 @@ class Centrum {
     }
     _removeAllSubscriptions() {
         for (let subName of this.subscriptions.values()) {
-            this._removeSubscription(subName);
+            this._removeAllSubscriptionsWithName(subName);
         }
     }
     _createPublish(name, beforeHook, afterHandler) {

@@ -1,5 +1,9 @@
 export declare type Hook = (...args: any[]) => any;
-export declare type Handler = (data: any) => void;
+export declare type Handler<T> = (data: any) => void;
+export interface SubscriptionHandler {
+    (data: any): Handler<Function>;
+    id: number;
+}
 export declare type Sequence = number;
 export interface REQUEST_MESSAGE {
     readonly name: string;
@@ -92,23 +96,41 @@ export declare class Centrum {
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
-    createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler): Function;
+    createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>): Function;
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
      * @param name - name for publish method
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
-    getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler): Function;
+    getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>): Function;
     removePublish(name: any): void;
     removeAllPublish(): void;
-    createSubscription(name: string, handler: Handler): void;
-    createOrAddSubscription(name: string, handler: Handler): void;
-    removeSubscription(name: string, index?: number): void;
+    /**
+     * creates a new subscription and subscription handler to process data when receiving a publication. Throws error if handler already exists.
+     * @param name - name of publication to subscribe to.
+     * @param handler - method that takes in publication data as parameter when received.
+     * @returns number - id of handler (used to remove subscription later if needed)
+     */
+    createSubscription(name: string, handler: Handler<Function>): number;
+    /**
+     * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
+     * @param name - name of publication to subscribe to.
+     * @param handler - method that takes in publication data as parameter when received.
+     * @returns number - id of handler added (used to remove subscription later if needed)
+     */
+    createOrAddSubscription(name: string, handler: Handler<Function>): number;
+    /**
+     * removes specific subscription by id
+     * @param id - id of subscription that gets returned on creation.
+     */
+    removeSubscriptionById(id: number): number | boolean;
+    removeAllSubscriptionsWithName(name: string): void;
     removeAllSubscriptions(): void;
     private _createSubscription;
     private _createOrAddSubscription;
-    private _removeSubscription;
+    private _removeSubscriptionById;
+    private _removeAllSubscriptionsWithName;
     private _removeAllSubscriptions;
     private _createPublish;
     private _getOrCreatePublish;

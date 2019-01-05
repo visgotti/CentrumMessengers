@@ -7,7 +7,7 @@ export class Publisher {
         this.pubSocket = pubSocket;
     }
 
-    public make(name, beforeHook?: Hook, afterHandler?: Handler) {
+    public make(name, beforeHook?: Hook, afterHandler?: Handler<Function>) {
         if(beforeHook) {
             return this.makeForBeforeHook(name, beforeHook, afterHandler);
         } else {
@@ -15,7 +15,7 @@ export class Publisher {
         }
     }
 
-    private makeForData(name, afterHandler?: Handler) {
+    private makeForData(name, afterHandler?: Handler<Function>) {
         if(afterHandler) {
             return ((data) => {
                 if(data === null) return;
@@ -34,7 +34,7 @@ export class Publisher {
         }
     }
 
-    private makeForBeforeHook(name, beforeHook: Hook, afterHandler?: Handler) {
+    private makeForBeforeHook(name, beforeHook: Hook, afterHandler?: Handler<Function>) {
         if(afterHandler) {
             return ((...args) => {
                 const sendData = beforeHook(...args);

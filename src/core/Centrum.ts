@@ -12,7 +12,7 @@ export type Hook = (...args: any[]) => any;
     sending data anywhere after that implicitly.
  */
 export type Handler<T> = (data: any) => void;
-export interface SubscriptionHandler { (data: any): Handler<any>; id: number; }
+export interface SubscriptionHandler { (data: any): Handler<Function>; id: number; }
 
 export type Sequence = number;
 
@@ -200,7 +200,7 @@ export class Centrum {
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
-    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function { throw new Error('Server is not configured to publish.') }
+    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function { throw new Error('Server is not configured to publish.') }
 
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
@@ -208,7 +208,7 @@ export class Centrum {
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      */
-    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function { throw new Error('Server is not configured to publish.') }
+    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
     public removeAllPublish() { throw new Error('Server is not configured to publish.')}
 
@@ -218,7 +218,7 @@ export class Centrum {
      * @param handler - method that takes in publication data as parameter when received.
      * @returns number - id of handler (used to remove subscription later if needed)
      */
-    public createSubscription(name: string, handler: Handler<any>) : number { throw new Error('Server is not configured to use subscriptions.') }
+    public createSubscription(name: string, handler: Handler<Function>) : number { throw new Error('Server is not configured to use subscriptions.') }
 
     /**
      * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
@@ -226,7 +226,7 @@ export class Centrum {
      * @param handler - method that takes in publication data as parameter when received.
      * @returns number - id of handler added (used to remove subscription later if needed)
      */
-    public createOrAddSubscription(name: string, handler: Handler<any>) : number { throw new Error('Server is not configured to use subscriptions.') }
+    public createOrAddSubscription(name: string, handler: Handler<Function>) : number { throw new Error('Server is not configured to use subscriptions.') }
 
     /**
      * removes specific subscription by id
@@ -236,7 +236,7 @@ export class Centrum {
     public removeAllSubscriptionsWithName(name: string) { throw new Error('Server is not configured to use subscriptions.')}
     public removeAllSubscriptions() { throw new Error('Server is not configured to use subscriptions.')}
 
-    private _createSubscription(name: string, handler: Handler<any>) {
+    private _createSubscription(name: string, handler: Handler<Function>) {
         if(!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
             return this.subscriber.addHandler(name, handler);
@@ -245,7 +245,7 @@ export class Centrum {
         }
     }
 
-    private _createOrAddSubscription(name: string, handler: Handler<any>) {
+    private _createOrAddSubscription(name: string, handler: Handler<Function>) {
         if(!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
         }
@@ -278,7 +278,7 @@ export class Centrum {
         }
     }
 
-    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function {
+    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function {
         if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
@@ -287,7 +287,7 @@ export class Centrum {
         return publish;
     }
 
-    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<any>) : Function {
+    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function {
         if(this.publish[name]) {
             return this.publish[name];
         }
