@@ -7,49 +7,29 @@ export class Publisher {
         this.pubSocket = pubSocket;
     }
 
-    public make(name, encode?: Function, beforeHook?: Hook, afterHandler?: Handler<Function>) {
+    public make(name, encode?: Function, beforeHook?: Hook) {
         if(beforeHook) {
-            return this.makeForBeforeHook(name, encode, beforeHook, afterHandler);
+            return this.makeForBeforeHook(name, encode, beforeHook);
         } else {
-            return this.makeForData(name, encode, afterHandler);
+            return this.makeForData(name, encode,);
         }
     }
 
-    private makeForData(name, encode, afterHandler?: Handler<Function>) {
-        if(afterHandler) {
-            return ((data) => {
-                if(data === null) return;
-                const encoded = encode ? encode(data) : data;
-                this.pubSocket.send([name, encoded]);
-                afterHandler(data)
-            });
-        } else {
+    private makeForData(name, encode) {
             return ((data) => {
                 if(data === null) return;
                 const encoded = encode ? encode(data) : data;
                 this.pubSocket.send([name, encoded]);
             });
-        }
     }
 
-    private makeForBeforeHook(name, encode, beforeHook: Hook, afterHandler?: Handler<Function>) {
-        if(afterHandler) {
-            return ((...args) => {
-                const sendData = beforeHook(...args);
-                if(sendData === null) return;
+    private makeForBeforeHook(name, encode, beforeHook: Hook) {
+        return ((...args) => {
+            const sendData = beforeHook(...args);
+            if(sendData === null) return;
 
-                const encoded = encode ? encode(sendData) : sendData;
-                this.pubSocket.send([name, encoded]);
-                afterHandler(sendData);
-            });
-        } else {
-            return ((...args) => {
-                const sendData = beforeHook(...args);
-                if(sendData === null) return;
-
-                const encoded = encode ? encode(sendData) : sendData;
-                this.pubSocket.send([name, encoded]);
-            });
-        }
+            const encoded = encode ? encode(sendData) : sendData;
+            this.pubSocket.send([name, encoded]);
+        })
     }
 }

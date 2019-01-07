@@ -124,27 +124,6 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('Executes the after handler correctly', function(done) {
-        let afterHandlerValue = 0;
-        pubServers[0].createPublish("afterTest", function(bar, baz) {
-            return bar * baz
-        }, function(data) {
-            afterHandlerValue = data + 5;
-        });
-
-        subServers[0].createSubscription("afterTest", "afterTest", function(data) {
-            assert.strictEqual(data, 10);
-        });
-
-        pubServers[0].publish.afterTest(2, 5);
-
-        setTimeout(() => {
-            // all sub1Expected and sub2Expected should have had the values filtered out
-            assert.strictEqual(afterHandlerValue, 15);
-            done();
-        }, 10);
-    });
-
     it('Centrum.removePublish removes ability to call the publish', function(done) {
         pubServers[0].createPublish("foo2", function(bar, baz) {
             return bar * baz
@@ -342,11 +321,11 @@ describe('Publish to subscription communication', function() {
     it('Works when serializationType is set to MSGPACK', function(done) {
         pubServers[0].createPublish("msgpack", function(bar, baz) {
             return bar * baz
-        }, null, 'MSGPACK');
+        }, 'MSGPACK');
 
         pubServers[1].createPublish("msgpack", function(bar, baz, foo) {
             return bar * baz * foo
-        }, null, 'MSGPACK');
+        }, 'MSGPACK');
 
         let sub1Expected = [10, 12, 20, 30, 40];
         let sub2Expected = [10, 12, 20, 30, 40];
@@ -383,7 +362,7 @@ describe('Publish to subscription communication', function() {
     it('Works when serializationType is set to NONE and hanlers implicitly serialize it.', function(done) {
         pubServers[0].createPublish("noSerialization", function(bar, baz) {
             return JSON.stringify((bar * baz))
-        }, null, 'NONE');
+        }, 'NONE');
 
         let sub1Expected = 10;
 
