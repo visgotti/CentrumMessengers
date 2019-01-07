@@ -9,6 +9,7 @@
   "author": "visgotti",
   "license": "MIT",
   "dependencies": {
+    "notepack.io": "^2.2.0",
     "zeromq": "^5.1.0"
   },
   "devDependencies": {

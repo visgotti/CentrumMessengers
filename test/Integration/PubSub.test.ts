@@ -339,4 +339,59 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
+    it('Works when serializationType is set to MSGPACK', function(done) {
+        pubServers[0].createPublish("msgpack", function(bar, baz) {
+            return bar * baz
+        }, null, 'MSGPACK');
+
+        pubServers[1].createPublish("msgpack", function(bar, baz, foo) {
+            return bar * baz * foo
+        }, null, 'MSGPACK');
+
+        let sub1Expected = [10, 12, 20, 30, 40];
+        let sub2Expected = [10, 12, 20, 30, 40];
+
+        subServers[0].createSubscription("msgpack", "msgpack", function(data) {
+            sub1Expected = sub1Expected.filter(val =>  val !== data);
+        }, 'MSGPACK');
+
+        subServers[1].createSubscription("msgpack", "msgpack", function(data) {
+            console.log('got data', data);
+            sub2Expected = sub2Expected.filter(val => val !== data);
+        }, 'MSGPACK');
+
+        pubServers[0].publish.msgpack(2, 5);
+        pubServers[0].publish.msgpack(2, 6);
+        pubServers[1].publish.msgpack(2, 5, 2);
+        pubServers[1].publish.msgpack(2, 5, 3);
+        pubServers[1].publish.msgpack(2, 5, 4);
+
+        setTimeout(() => {
+            // all sub1Expected and sub2Expected should have had the values filtered out
+            assert.strictEqual(sub1Expected.length, 0);
+            assert.strictEqual(sub2Expected.length, 0);
+            if(sub1Expected.length > 0) {
+                console.log(sub1Expected)
+            }
+            if(sub2Expected.length > 0) {
+                console.log(sub2Expected)
+            }
+            done();
+        }, 10);
+    });
+
+    it('Works when serializationType is set to NONE and hanlers implicitly serialize it.', function(done) {
+        pubServers[0].createPublish("noSerialization", function(bar, baz) {
+            return JSON.stringify((bar * baz))
+        }, null, 'NONE');
+
+        let sub1Expected = 10;
+
+        subServers[0].createSubscription("noSerialization", "noSerialization", function(data) {
+            assert.strictEqual(JSON.parse(data), sub1Expected);
+            done();
+        }, 'NONE');
+
+        pubServers[0].publish.noSerialization(2, 5);
+    });
 });

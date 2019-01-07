@@ -7,40 +7,38 @@ export class Publisher {
         this.pubSocket = pubSocket;
     }
 
-    public make(name, beforeHook?: Hook, afterHandler?: Handler<Function>) {
+    public make(name, encode?: Function, beforeHook?: Hook, afterHandler?: Handler<Function>) {
         if(beforeHook) {
-            return this.makeForBeforeHook(name, beforeHook, afterHandler);
+            return this.makeForBeforeHook(name, encode, beforeHook, afterHandler);
         } else {
-            return this.makeForData(name, afterHandler);
+            return this.makeForData(name, encode, afterHandler);
         }
     }
 
-    private makeForData(name, afterHandler?: Handler<Function>) {
+    private makeForData(name, encode, afterHandler?: Handler<Function>) {
         if(afterHandler) {
             return ((data) => {
                 if(data === null) return;
-
-                const encoded = JSON.stringify(data);
+                const encoded = encode ? encode(data) : data;
                 this.pubSocket.send([name, encoded]);
                 afterHandler(data)
             });
         } else {
             return ((data) => {
                 if(data === null) return;
-
-                const encoded = JSON.stringify(data);
+                const encoded = encode ? encode(data) : data;
                 this.pubSocket.send([name, encoded]);
             });
         }
     }
 
-    private makeForBeforeHook(name, beforeHook: Hook, afterHandler?: Handler<Function>) {
+    private makeForBeforeHook(name, encode, beforeHook: Hook, afterHandler?: Handler<Function>) {
         if(afterHandler) {
             return ((...args) => {
                 const sendData = beforeHook(...args);
                 if(sendData === null) return;
 
-                const encoded = JSON.stringify(sendData);
+                const encoded = encode ? encode(sendData) : sendData;
                 this.pubSocket.send([name, encoded]);
                 afterHandler(sendData);
             });
@@ -49,7 +47,7 @@ export class Publisher {
                 const sendData = beforeHook(...args);
                 if(sendData === null) return;
 
-                const encoded = JSON.stringify(sendData);
+                const encoded = encode ? encode(sendData) : sendData;
                 this.pubSocket.send([name, encoded]);
             });
         }

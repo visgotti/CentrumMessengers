@@ -1,4 +1,5 @@
 import * as zmq from 'zeromq';
+import { SERIALIZER_TYPES, get } from '../Serializers';
 
 /*
     Hook is a function used that processes data and then
@@ -12,7 +13,7 @@ export type Hook = (...args: any[]) => any;
     sending data anywhere after that implicitly.
  */
 export type Handler<T> = (data: any) => void;
-export interface SubscriptionHandler { (data: any): Handler<Function>; id: string; }
+export interface SubscriptionHandler { (data: any): Handler<Function>; id: string; decode?: Function }
 
 export type Sequence = number;
 
@@ -207,16 +208,18 @@ export class Centrum {
      * @param name - name for publish method
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function { throw new Error('Server is not configured to publish.') }
+    public createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : Function { throw new Error('Server is not configured to publish.') }
 
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
      * @param name - name for publish method
      * @param beforeHook - hook that sends return value as message
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
+     * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function { throw new Error('Server is not configured to publish.') }
+    public getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : Function { throw new Error('Server is not configured to publish.') }
     public removePublish(name) { throw new Error('Server is not configured to publish.')}
     public removeAllPublish() { throw new Error('Server is not configured to publish.')}
 
@@ -225,18 +228,20 @@ export class Centrum {
      * @param name - name of publication to subscribe to.
      * @param id - identifier for handler to run on publication
      * @param handler - method that takes in publication data as parameter when received.
+     * @param serializer - enum value that tells the subscriber how to decode incoming message, look at SERIALIZER_TYPES for more info
      * @returns boolean - returns true if it was successful.
      */
-    public createSubscription(name: string, id: string, handler: Handler<Function>) : boolean { throw new Error('Server is not configured to use subscriptions.') }
+    public createSubscription(name: string, id: string, handler: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : boolean { throw new Error('Server is not configured to use subscriptions.') }
 
     /**
      * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
      * @param name - name of publication to subscribe to.
      * @param id - identifier for handler to run on publication
      * @param handler - method that takes in publication data as parameter when received.
+     * @param serializer - enum value that tells the subscriber how to decode incoming message, look at SERIALIZER_TYPES for more info
      * @returns CREATED_OR_ADDED - enum value to signify if you created new subscription or added new handler to existing subscription.
      */
-    public createOrAddSubscription(name: string, id: string, handler: Handler<Function>) : CREATED_OR_ADDED { throw new Error('Server is not configured to use subscriptions.') }
+    public createOrAddSubscription(name: string, id: string, handler: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : CREATED_OR_ADDED { throw new Error('Server is not configured to use subscriptions.') }
 
     /**
      * removes specific subscription by id
@@ -268,12 +273,15 @@ export class Centrum {
      */
     public getSubscriptionNamesForHandlerId(id: string) { throw new Error('Server is not configured to use subscriptions.') }
 
-    private _createSubscription(name: string, id: string, handler: Handler<Function>) : boolean {
+    private _createSubscription(name: string, id: string, handler: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : boolean {
         if(this.subscriptions.has(name)) {
             throw new Error(`Subscription already has a handler for name: ${name}. If you want to add multiple handlers use createOrAddSubscription or the addHandler method directly on your subscription object.`);
         }
+
+        const { decode } = get(serializer);
+
         this.subscriptions.add(name);
-        const subscribed = this.subscriber.addHandler(name, id, handler);
+        const subscribed = this.subscriber.addHandler(name, id, handler, decode);
         if(subscribed.error) {
             console.log('the error was', subscribed.error);
             throw new Error(subscribed.error);
@@ -281,13 +289,17 @@ export class Centrum {
         return true;
     }
 
-    private _createOrAddSubscription(name: string, id: string, handler: Handler<Function>) : CREATED_OR_ADDED {
+    private _createOrAddSubscription(name: string, id: string, handler: Handler<Function>,  serializer=SERIALIZER_TYPES.JSON) : CREATED_OR_ADDED {
         let createdOrAdded = CREATED_OR_ADDED.CREATED;
+
+        const { decode } = get(serializer);
+
         if(!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
             createdOrAdded = CREATED_OR_ADDED.ADDED;
         }
-        const subscribed = this.subscriber.addHandler(name, id, handler);
+
+        const subscribed = this.subscriber.addHandler(name, id, handler, decode);
         if(subscribed.error) {
             throw new Error(subscribed.error);
         }
@@ -332,20 +344,26 @@ export class Centrum {
         return this.subscriber.getSubscriptionNamesForHandlerId(id);
     }
 
-    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function {
+    private _createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : Function {
         if(this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-        const publish = this.publisher.make(name, beforeHook, afterHandler);
+
+        const { encode } = get(serializer);
+
+        const publish = this.publisher.make(name, encode, beforeHook, afterHandler);
         this.publish[name] = publish;
         return publish;
     }
 
-    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>) : Function {
+    private _getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>, serializer=SERIALIZER_TYPES.JSON): Function {
         if(this.publish[name]) {
             return this.publish[name];
         }
-        const publish = this.publisher.make(name, beforeHook, afterHandler);
+
+        const { encode } = get(serializer);
+
+        const publish = this.publisher.make(name, encode, beforeHook, afterHandler);
         this.publish[name] = publish;
         return publish;
     }
