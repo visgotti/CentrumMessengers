@@ -125,7 +125,7 @@ class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    createPublish(name, beforeHook, afterHandler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to publish.'); }
+    createPublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to publish.'); }
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
      * @param name - name for publish method
@@ -133,7 +133,7 @@ class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    getOrCreatePublish(name, beforeHook, afterHandler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to publish.'); }
+    getOrCreatePublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to publish.'); }
     removePublish(name) { throw new Error('Server is not configured to publish.'); }
     removeAllPublish() { throw new Error('Server is not configured to publish.'); }
     /**
@@ -240,21 +240,21 @@ class Centrum {
     _getSubscriptionNamesForHandlerId(id) {
         return this.subscriber.getSubscriptionNamesForHandlerId(id);
     }
-    _createPublish(name, beforeHook, afterHandler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
+    _createPublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
         if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
         const { encode } = Serializers_1.get(serializer);
-        const publish = this.publisher.make(name, encode, beforeHook, afterHandler);
+        const publish = this.publisher.make(name, encode, beforeHook);
         this.publish[name] = publish;
         return publish;
     }
-    _getOrCreatePublish(name, beforeHook, afterHandler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
+    _getOrCreatePublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
         if (this.publish[name]) {
             return this.publish[name];
         }
         const { encode } = Serializers_1.get(serializer);
-        const publish = this.publisher.make(name, encode, beforeHook, afterHandler);
+        const publish = this.publisher.make(name, encode, beforeHook);
         this.publish[name] = publish;
         return publish;
     }

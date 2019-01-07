@@ -103,7 +103,7 @@ export declare class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    createPublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>, serializer?: SERIALIZER_TYPES): Function;
+    createPublish(name: string, beforeHook?: Hook, serializer?: SERIALIZER_TYPES): Function;
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
      * @param name - name for publish method
@@ -111,7 +111,7 @@ export declare class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    getOrCreatePublish(name: string, beforeHook?: Hook, afterHandler?: Handler<Function>, serializer?: SERIALIZER_TYPES): Function;
+    getOrCreatePublish(name: string, beforeHook?: Hook, serializer?: SERIALIZER_TYPES): Function;
     removePublish(name: any): void;
     removeAllPublish(): void;
     /**
