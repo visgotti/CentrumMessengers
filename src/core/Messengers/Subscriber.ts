@@ -1,4 +1,4 @@
-import { SubscriptionHandler } from '../Centrum';
+import { SubscriptionHandler } from '../Messenger';
 
 export class Subscriber {
     private subSocket: any;

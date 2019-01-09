@@ -1,6 +1,6 @@
 {
-  "name": "Centrum",
-  "version": "0.0.1",
+  "name": "CentrumMessengers",
+  "version": "0.1.0",
   "description": "Low 'enough' level node.js distributed messaging.",
   "scripts": {
     "build": "tsc",

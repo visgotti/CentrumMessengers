@@ -3,7 +3,7 @@ import * as mocha from 'mocha';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Centrum } from '../../src/core/Centrum';
+import { Messenger } from '../../src/core/Messenger';
 
 describe('Publish to subscription communication', function() {
     let config: any;
@@ -13,7 +13,7 @@ describe('Publish to subscription communication', function() {
     let pub2Calls = 0;
 
     before('Initialize four servers, two publishers, two subscribers', (done) => {
-        config = fs.readFileSync(path.resolve('test', 'centrum.config.json'));
+        config = fs.readFileSync(path.resolve('test', 'messenger.config.json'));
         config = JSON.parse(config);
 
         pub1Calls = 0;
@@ -25,13 +25,13 @@ describe('Publish to subscription communication', function() {
         for(let i = 0; i < config.servers.length; i++) {
             const serverData = config.servers[i];
 
-            if(!("publish" in serverData.centrumOptions) && !("subscribe" in serverData.centrumOptions)) continue;
+            if(!("publish" in serverData.messengerOptions) && !("subscribe" in serverData.messengerOptions)) continue;
 
-            let server = new Centrum(serverData.centrumOptions);
+            let server = new Messenger(serverData.messengerOptions);
 
-            if(serverData.centrumOptions["publish"]) {
+            if(serverData.messengerOptions["publish"]) {
                 pubServers.push(server);
-            } else if (serverData.centrumOptions["subscribe"]) {
+            } else if (serverData.messengerOptions["subscribe"]) {
                 subServers.push(server);
             }
         }
@@ -124,7 +124,7 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('Centrum.removePublish removes ability to call the publish', function(done) {
+    it('Messenger.removePublish removes ability to call the publish', function(done) {
         pubServers[0].createPublish("foo2", function(bar, baz) {
             return bar * baz
         });
@@ -179,7 +179,7 @@ describe('Publish to subscription communication', function() {
         }, 100);
     });
 
-    it('Centrum.removeAllSubscriptionsWithName stops all instances with name foo3 from receiving published data', function(done) {
+    it('Messenger.removeAllSubscriptionsWithName stops all instances with name foo3 from receiving published data', function(done) {
         let sub1Received = 0;
         let sub2Received = 0;
 
@@ -209,7 +209,7 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('centrum.subscriber.addHandler and centrum.addOrCreateSubscription both register multiple handlers for a subscriber', function(done) {
+    it('messenger.subscriber.addHandler and messenger.addOrCreateSubscription both register multiple handlers for a subscriber', function(done) {
         let sub1Received = 0;
 
         pubServers[0].createPublish("foo4");
@@ -240,7 +240,7 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('centrum.removeSubscriptionById removes only 1', function(done) {
+    it('messenger.removeSubscriptionById removes only 1', function(done) {
         let sub1Received = 0;
 
         pubServers[0].createPublish("foo5");
@@ -276,7 +276,7 @@ describe('Publish to subscription communication', function() {
         }, 10);
     });
 
-    it('centrum.removeAllSubscriptionsWithId removes all subscriptions with the id', function(done) {
+    it('messenger.removeAllSubscriptionsWithId removes all subscriptions with the id', function(done) {
         let sub1Received = 0;
 
         const id = "id-1";

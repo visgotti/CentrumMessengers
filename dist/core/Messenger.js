@@ -1,156 +1,75 @@
-import * as zmq from 'zeromq';
-import { SERIALIZER_TYPES, get } from '../Serializers';
-
-/*
-    Hook is a function used that processes data and then
-    whatever it returns is sent in the message as the data attribute
- */
-export type Hook = (...args: any[]) => any;
-
-/*
-    Handler is a function that is used to process data
-    received from a server but does not worry about
-    sending data anywhere after that implicitly.
- */
-export type Handler<T> = (data: any) => void;
-export interface SubscriptionHandler { (data: any): Handler<Function>; id: string; decode?: Function }
-
-export type Sequence = number;
-
-export interface REQUEST_MESSAGE  {
-    readonly name: string,
-    readonly from: string,
-    readonly sequence: number,
-    data: any,
-}
-
-export interface RESPONSE_MESSAGE  {
-    readonly sequence: number,
-    data: any,
-}
-export interface CentrumConfig {
-    'broker': {
-        ['URI']: string,
-    }
-    ['servers']:
-        Array<{
-            ['name']: string,
-            ['centrumOptions']: any
-        }>
-}
-
-export interface RequestOptions {
-    timeout?: number,
-}
-
-export interface PublishOptions {
-    pubSocketURI: string,
-}
-
-export interface SubscribeOptions {
-    pubSocketURIs: Array<string>,
-}
-
-export interface CentrumOptions {
-    id: string,
-    brokerURI?: string,
-    request?: RequestOptions,
-    response?: boolean,
-    publish?: PublishOptions,
-    subscribe?: SubscribeOptions,
-}
-
-enum CREATED_OR_ADDED {
-    CREATED = 'CREATED',
-    ADDED = 'ADDED',
-}
-
-import { Requester } from './Messengers/Requester';
-import { Responder } from './Messengers/Responder';
-import { Publisher } from './Messengers/Publisher';
-import { Subscriber } from './Messengers/Subscriber';
-
-export class Centrum {
-    public serverId: string;
-    public requests?: { [name: string]: Function };
-    public responses?: Set<string>;
-    public subscriptions?: Set<string>;
-    public publish?: { [name: string]: Function };
-    public requester?: Requester;
-    public responder?: any;
-    public notifier?: any;
-    public subscriber?: any;
-    public publisher?: any;
-    private dealerSocket: any;
-    private pubSocket: any;
-    private subSocket: any;
-    private options: CentrumOptions;
-
-    constructor(options: CentrumOptions) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const zmq = require("zeromq");
+const Serializers_1 = require("../Serializers");
+var CREATED_OR_ADDED;
+(function (CREATED_OR_ADDED) {
+    CREATED_OR_ADDED["CREATED"] = "CREATED";
+    CREATED_OR_ADDED["ADDED"] = "ADDED";
+})(CREATED_OR_ADDED || (CREATED_OR_ADDED = {}));
+const Requester_1 = require("./Messengers/Requester");
+const Responder_1 = require("./Messengers/Responder");
+const Publisher_1 = require("./Messengers/Publisher");
+const Subscriber_1 = require("./Messengers/Subscriber");
+class Messenger {
+    constructor(options) {
         this.serverId = options.id;
         this.dealerSocket = null;
         this.pubSocket = null;
-
         this.publish = null;
         this.publisher = null;
-
         this.requests = null;
         this.requester = null;
-
         this.responses = null;
         this.responder = null;
-
         this.subscriptions = null;
         this.subscriber = null;
         this.options = options;
         this.initializeMessengers(options);
     }
-
     /**
-     * sets and initializes available public functions based on centrum options passed in.
+     * sets and initializes available public functions based on messenger options passed in.
      * @param options
      */
-    private initializeMessengers(options: CentrumOptions) {
-        if(options.brokerURI) {
+    initializeMessengers(options) {
+        if (options.brokerURI) {
             this.dealerSocket = zmq.socket('dealer');
             this.dealerSocket.identity = this.serverId;
             this.dealerSocket.connect(options.brokerURI);
         }
-
-        if(options.request) {
-            if(!this.dealerSocket) throw `Please provide a broker URI in your centrumOptions for request server: ${this.serverId}`;
+        if (options.request) {
+            if (!this.dealerSocket)
+                throw `Please provide a broker URI in your messengerOptions for request server: ${this.serverId}`;
             this.requests = {};
-            this.requester = new Requester(this.dealerSocket, options.request);
+            this.requester = new Requester_1.Requester(this.dealerSocket, options.request);
             this.createRequest = this._createRequest;
             this.removeRequest = this._removeRequest;
         }
-
-        if(options.response) {
-            if(!this.dealerSocket) throw `Please provide a broker URI in your centrumOptions for response server: ${this.serverId}`;
+        if (options.response) {
+            if (!this.dealerSocket)
+                throw `Please provide a broker URI in your messengerOptions for response server: ${this.serverId}`;
             this.responses = new Set();
-            this.responder = new Responder(this.dealerSocket);
+            this.responder = new Responder_1.Responder(this.dealerSocket);
             this.createResponse = this._createResponse;
             this.removeResponse = this._removeResponse;
         }
-
-        if(options.publish) {
+        if (options.publish) {
             this.publish = {};
             this.pubSocket = zmq.socket('pub');
             this.pubSocket.bindSync(options.publish.pubSocketURI);
-            this.publisher = new Publisher(this.pubSocket);
+            this.publisher = new Publisher_1.Publisher(this.pubSocket);
             this.getOrCreatePublish = this._getOrCreatePublish;
             this.createPublish = this._createPublish;
             this.removePublish = this._removePublish;
             this.removeAllPublish = this._removeAllPublish;
         }
-
-        if(options.subscribe) {
+        if (options.subscribe) {
             this.subSocket = zmq.socket('sub');
-            for(let i = 0; i < options.subscribe.pubSocketURIs.length; i++) {
+            for (let i = 0; i < options.subscribe.pubSocketURIs.length; i++) {
                 this.subSocket.connect(options.subscribe.pubSocketURIs[i]);
             }
             this.subscriptions = new Set();
-            this.subscriber = new Subscriber(this.subSocket);
+            this.subscriber = new Subscriber_1.Subscriber(this.subSocket);
             this.createSubscription = this._createSubscription;
             this.createOrAddSubscription = this._createOrAddSubscription;
             this.removeSubscriptionById = this._removeSubscriptionById;
@@ -161,27 +80,25 @@ export class Centrum {
             this.getSubscriptionNamesForHandlerId = this._getSubscriptionNamesForHandlerId;
         }
     }
-
-    public close() {
-        if(this.pubSocket) {
+    close() {
+        if (this.pubSocket) {
             this._removeAllPublish();
             this.pubSocket.close();
             this.pubSocket = null;
         }
-        if(this.subSocket) {
+        if (this.subSocket) {
             this._removeAllSubscriptions();
             this.subSocket.close();
             this.subSocket = null;
         }
-        if(this.dealerSocket) {
+        if (this.dealerSocket) {
             this.dealerSocket.close();
             this.dealerSocket = null;
         }
     }
-
     /**
      * If options.request was passed into constructor, you can use this function to create
-     * and send requests. After running this you can make your request by Centrum.requests.name() in which
+     * and send requests. After running this you can make your request by Messenger.requests.name() in which
      * the name() function is the beforeRequestHook passed in.
      * @param name - unique name of request which will be used
      * @param to - id of server you are sending request to.
@@ -190,9 +107,8 @@ export class Centrum {
      * if left out, by default you can pass in an object when calling request and send that.
      * whatever it returns gets sent.
      */
-    public createRequest(name: string, to: string, beforeHook?: Hook) : Function { throw new Error('Server is not configured to use requests.') }
-    public removeRequest(name) { throw new Error('Server is not configured to use requests.')}
-
+    createRequest(name, to, beforeHook) { throw new Error('Server is not configured to use requests.'); }
+    removeRequest(name) { throw new Error('Server is not configured to use requests.'); }
     /**
      * If options.response was passed into constructor, you can use this function to create
      * an onRequest handler, with a hook that processes the request data and whatever
@@ -200,9 +116,8 @@ export class Centrum {
      * @param name - unique name of request which will be used
      * @param onRequestHook - Hook to process data from request, whatever it returns gets sent back
      */
-    public createResponse(name: string, beforeHook: Hook) { throw new Error('Server is not configured use responses.') }
-    public removeResponse(name) { throw new Error('Server is not configured to use responses.')}
-
+    createResponse(name, beforeHook) { throw new Error('Server is not configured use responses.'); }
+    removeResponse(name) { throw new Error('Server is not configured to use responses.'); }
     /**
      *
      * @param name - name for publish method
@@ -210,8 +125,7 @@ export class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    public createPublish(name: string, beforeHook?: Hook, serializer=SERIALIZER_TYPES.JSON) : Function { throw new Error('Server is not configured to publish.') }
-
+    createPublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to publish.'); }
     /**
      * does same thing as createPublish but if the publish name already exists it will return the handler.
      * @param name - name for publish method
@@ -219,10 +133,9 @@ export class Centrum {
      * @param afterHandler - hook used for cleanup after publishing a method, gets message sent as param.
      * @param serializer - enum value that tells the publisher how to encode your message, look at SERIALIZER_TYPES for more info
      */
-    public getOrCreatePublish(name: string, beforeHook?: Hook, serializer=SERIALIZER_TYPES.JSON) : Function { throw new Error('Server is not configured to publish.') }
-    public removePublish(name) { throw new Error('Server is not configured to publish.')}
-    public removeAllPublish() { throw new Error('Server is not configured to publish.')}
-
+    getOrCreatePublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to publish.'); }
+    removePublish(name) { throw new Error('Server is not configured to publish.'); }
+    removeAllPublish() { throw new Error('Server is not configured to publish.'); }
     /**
      * creates a new subscription and subscription handler to process data when receiving a publication. Throws error if handler already exists.
      * @param name - name of publication to subscribe to.
@@ -231,8 +144,7 @@ export class Centrum {
      * @param serializer - enum value that tells the subscriber how to decode incoming message, look at SERIALIZER_TYPES for more info
      * @returns boolean - returns true if it was successful.
      */
-    public createSubscription(name: string, id: string, handler: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : boolean { throw new Error('Server is not configured to use subscriptions.') }
-
+    createSubscription(name, id, handler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to use subscriptions.'); }
     /**
      * creates a new subscription if it doesnt exist but if it does, instead of throwing an error it will add a new handler to be ran on the publication
      * @param name - name of publication to subscribe to.
@@ -241,178 +153,155 @@ export class Centrum {
      * @param serializer - enum value that tells the subscriber how to decode incoming message, look at SERIALIZER_TYPES for more info
      * @returns CREATED_OR_ADDED - enum value to signify if you created new subscription or added new handler to existing subscription.
      */
-    public createOrAddSubscription(name: string, id: string, handler: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : CREATED_OR_ADDED { throw new Error('Server is not configured to use subscriptions.') }
-
+    createOrAddSubscription(name, id, handler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) { throw new Error('Server is not configured to use subscriptions.'); }
     /**
      * removes specific subscription by id
      * @param id - id of subscription that gets returned on creation.
      * @param name - name of subscription that gets returned on creation.
      * @returns - number of subscriptions removed.
      */
-    public removeSubscriptionById(id: string, name: string) : number { throw new Error('Server is not configured to use subscriptions.')}
+    removeSubscriptionById(id, name) { throw new Error('Server is not configured to use subscriptions.'); }
     /**
      * removes all handlers for all subscriptions that have the given id.
      * @param id - id used to identify handlers for different subscription names.
      * @returns number - ammount of handlers removed.
      */
-    public removeAllSubscriptionsWithId(id: string) : number { throw new Error('Server is not configured to use subscriptions.')}
-    public removeAllSubscriptionsWithName(name: string) { throw new Error('Server is not configured to use subscriptions.')}
-    public removeAllSubscriptions() { throw new Error('Server is not configured to use subscriptions.')}
-
+    removeAllSubscriptionsWithId(id) { throw new Error('Server is not configured to use subscriptions.'); }
+    removeAllSubscriptionsWithName(name) { throw new Error('Server is not configured to use subscriptions.'); }
+    removeAllSubscriptions() { throw new Error('Server is not configured to use subscriptions.'); }
     /**
      * returns all ids that have a handler registered for name.
      * @param name
      * @returns array
      */
-    public getHandlerIdsForSubscriptionName(name: string) { throw new Error('Server is not configured to use subscriptions.') }
-
+    getHandlerIdsForSubscriptionName(name) { throw new Error('Server is not configured to use subscriptions.'); }
     /**
      * returns all subscription names that a handler id is waiting for.
      * @param id
      * @returns array
      */
-    public getSubscriptionNamesForHandlerId(id: string) { throw new Error('Server is not configured to use subscriptions.') }
-
-    private _createSubscription(name: string, id: string, handler: Handler<Function>, serializer=SERIALIZER_TYPES.JSON) : boolean {
-        if(this.subscriptions.has(name)) {
+    getSubscriptionNamesForHandlerId(id) { throw new Error('Server is not configured to use subscriptions.'); }
+    _createSubscription(name, id, handler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
+        if (this.subscriptions.has(name)) {
             throw new Error(`Subscription already has a handler for name: ${name}. If you want to add multiple handlers use createOrAddSubscription or the addHandler method directly on your subscription object.`);
         }
-
-        const { decode } = get(serializer);
-
+        const { decode } = Serializers_1.get(serializer);
         this.subscriptions.add(name);
         const subscribed = this.subscriber.addHandler(name, id, handler, decode);
-        if(subscribed.error) {
+        if (subscribed.error) {
             console.log('the error was', subscribed.error);
             throw new Error(subscribed.error);
         }
         return true;
     }
-
-    private _createOrAddSubscription(name: string, id: string, handler: Handler<Function>,  serializer=SERIALIZER_TYPES.JSON) : CREATED_OR_ADDED {
+    _createOrAddSubscription(name, id, handler, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
         let createdOrAdded = CREATED_OR_ADDED.CREATED;
-
-        const { decode } = get(serializer);
-
-        if(!(this.subscriptions.has(name))) {
+        const { decode } = Serializers_1.get(serializer);
+        if (!(this.subscriptions.has(name))) {
             this.subscriptions.add(name);
             createdOrAdded = CREATED_OR_ADDED.ADDED;
         }
-
         const subscribed = this.subscriber.addHandler(name, id, handler, decode);
-        if(subscribed.error) {
+        if (subscribed.error) {
             throw new Error(subscribed.error);
         }
         return createdOrAdded;
     }
-
-    private _removeSubscriptionById(id: string, name: string) : number {
+    _removeSubscriptionById(id, name) {
         const removed = this.subscriber.removeHandlerById(id, name);
-        if(!(removed.success)) return 0;
-
-        if(removed.handlersLeft === 0) {
+        if (!(removed.success))
+            return 0;
+        if (removed.handlersLeft === 0) {
             this.subscriptions.delete(removed.name);
         }
         return removed.handlersLeft;
     }
-
-    private _removeAllSubscriptionsWithId(id: string) : number {
+    _removeAllSubscriptionsWithId(id) {
         return this.subscriber.removeAllHandlersWithId(id);
     }
-
-    private _removeAllSubscriptionsWithName(name: string) : boolean {
+    _removeAllSubscriptionsWithName(name) {
         if (this.subscriptions.has(name)) {
             this.subscriber.removeAllHandlersWithName(name);
             this.subscriptions.delete(name);
             return true;
-        } else {
+        }
+        else {
             throw new Error(`Subscription does not exist for name: ${name}`);
         }
     }
-
-    private _removeAllSubscriptions() {
-        for(let subName of this.subscriptions.values()) {
+    _removeAllSubscriptions() {
+        for (let subName of this.subscriptions.values()) {
             this._removeAllSubscriptionsWithName(subName);
         }
     }
-
-    private _getHandlerIdsForSubscriptionName(name: string) : Array<string> {
+    _getHandlerIdsForSubscriptionName(name) {
         return this.subscriber.getHandlerIdsForSubscriptionName(name);
     }
-
-    private _getSubscriptionNamesForHandlerId(id: string) : Array<string> {
+    _getSubscriptionNamesForHandlerId(id) {
         return this.subscriber.getSubscriptionNamesForHandlerId(id);
     }
-
-    private _createPublish(name: string, beforeHook?: Hook, serializer=SERIALIZER_TYPES.JSON) : Function {
-        if(this.publish[name]) {
+    _createPublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
+        if (this.publish[name]) {
             throw new Error(`Duplicate publisher name: ${name}`);
         }
-
-        const { encode } = get(serializer);
-
+        const { encode } = Serializers_1.get(serializer);
         const publish = this.publisher.make(name, encode, beforeHook);
         this.publish[name] = publish;
         return publish;
     }
-
-    private _getOrCreatePublish(name: string, beforeHook?: Hook, serializer=SERIALIZER_TYPES.JSON): Function {
-        if(this.publish[name]) {
+    _getOrCreatePublish(name, beforeHook, serializer = Serializers_1.SERIALIZER_TYPES.JSON) {
+        if (this.publish[name]) {
             return this.publish[name];
         }
-
-        const { encode } = get(serializer);
-
+        const { encode } = Serializers_1.get(serializer);
         const publish = this.publisher.make(name, encode, beforeHook);
         this.publish[name] = publish;
         return publish;
     }
-
-    private _removePublish(name: string) {
-        if(this.publish[name]) {
+    _removePublish(name) {
+        if (this.publish[name]) {
             delete this.publish[name];
-        } else {
+        }
+        else {
             throw new Error(`Publisher does not exist for name: ${name}`);
         }
     }
-
-    private _removeAllPublish() {
+    _removeAllPublish() {
         Object.keys(this.publish).forEach(pubName => {
             this._removePublish(pubName);
         });
     }
-
-    private _createRequest(name: string, to: string, beforeHook?: Hook) : Function {
-        if(this.requests[name]) {
+    _createRequest(name, to, beforeHook) {
+        if (this.requests[name]) {
             throw new Error(`Duplicate request name: ${name}`);
         }
         const request = !beforeHook ? this.requester.makeForData(name, to) : this.requester.makeForHook(name, to, beforeHook);
         this.requests[name] = request;
         return request;
     }
-
-    private _removeRequest(name: string) {
-        if(this.requests[name]) {
-            delete this.requests[name]
-        } else {
+    _removeRequest(name) {
+        if (this.requests[name]) {
+            delete this.requests[name];
+        }
+        else {
             throw new Error(`Request does not exist for name: ${name}`);
         }
     }
-
-    private _createResponse(name: string, beforeHook: Hook) {
-        if(this.responses.has(name)) {
+    _createResponse(name, beforeHook) {
+        if (this.responses.has(name)) {
             throw new Error(`Duplicate response name: ${name}`);
         }
         this.responses.add(name);
         this.responder.addOnRequestHook(name, beforeHook);
     }
-
-    private _removeResponse(name: string) {
-        if(this.responses.has(name)) {
+    _removeResponse(name) {
+        if (this.responses.has(name)) {
             this.responses.delete(name);
             this.responder.removeOnRequestHook(name);
-        } else {
+        }
+        else {
             throw new Error(`Response does not exist for name: ${name}`);
         }
     }
 }
+exports.Messenger = Messenger;

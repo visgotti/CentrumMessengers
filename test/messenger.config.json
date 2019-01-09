@@ -4,7 +4,7 @@
   },
   "servers": [
     {
-      "centrumOptions":
+      "messengerOptions":
       {
         "id": "requestServer1",
         "request": {
@@ -14,7 +14,7 @@
       }
     },
     {
-      "centrumOptions":
+      "messengerOptions":
       {
         "id": "responseServer1",
         "response": true,
@@ -22,7 +22,7 @@
       }
     },
     {
-      "centrumOptions":
+      "messengerOptions":
       {
         "id": "pubServer1",
         "publish": {
@@ -31,7 +31,7 @@
       }
     },
     {
-      "centrumOptions": {
+      "messengerOptions": {
         "id": "pubServer2",
         "publish": {
           "pubSocketURI": "tcp://127.0.0.1:4202"
@@ -39,7 +39,7 @@
       }
     },
     {
-      "centrumOptions": {
+      "messengerOptions": {
         "id": "subServer1",
         "subscribe": {
           "pubSocketURIs": ["tcp://127.0.0.1:4201", "tcp://127.0.0.1:4202"]
@@ -47,7 +47,7 @@
       }
     },
     {
-      "centrumOptions": {
+      "messengerOptions": {
         "id": "subServer2",
         "subscribe": {
           "pubSocketURIs": ["tcp://127.0.0.1:4201", "tcp://127.0.0.1:4202"]

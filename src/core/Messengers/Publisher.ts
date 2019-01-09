@@ -1,4 +1,4 @@
-import { Hook, Handler } from '../Centrum';
+import { Hook } from '../Messenger';
 
 export class Publisher {
     private pubSocket: any;

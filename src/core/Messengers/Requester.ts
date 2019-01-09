@@ -1,4 +1,4 @@
-import { REQUEST_MESSAGE, RequestOptions, Hook, Sequence } from '../Centrum';
+import { REQUEST_MESSAGE, RequestOptions, Hook, Sequence } from '../Messenger';
 import Timeout = NodeJS.Timeout;
 
 export class Requester {

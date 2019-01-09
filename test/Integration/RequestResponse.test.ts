@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Broker } from '../../src/core/Broker';
-import { Centrum } from '../../src/core/Centrum';
+import { Messenger } from '../../src/core/Messenger';
 
 describe('Request to response server communication', function() {
     let config: any;
@@ -13,19 +13,19 @@ describe('Request to response server communication', function() {
     let responseServer;
 
     before('Initialize two servers, one as a requester, one as a responder.', (done) => {
-        config = fs.readFileSync(path.resolve('test', 'centrum.config.json'));
+        config = fs.readFileSync(path.resolve('test', 'messenger.config.json'));
         config = JSON.parse(config);
         let brokerURI = config.broker.URI;
         broker = new Broker(brokerURI, "TEST_BROKER");
 
         for(let i = 0; i < config.servers.length; i++) {
             const serverData = config.servers[i];
-            if (!("request" in serverData.centrumOptions) && !("response" in serverData.centrumOptions)) continue;
-            let server = new Centrum(serverData.centrumOptions);
+            if (!("request" in serverData.messengerOptions) && !("response" in serverData.messengerOptions)) continue;
+            let server = new Messenger(serverData.messengerOptions);
 
-            if (serverData.centrumOptions["request"]) {
+            if (serverData.messengerOptions["request"]) {
                 requestServer = server;
-            } else if (serverData.centrumOptions["response"]) {
+            } else if (serverData.messengerOptions["response"]) {
                 responseServer = server;
             }
         }
