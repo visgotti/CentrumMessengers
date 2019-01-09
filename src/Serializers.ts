@@ -29,7 +29,6 @@ export function get(type: SERIALIZER_TYPES) : Serializer {
             }
         }
         case SERIALIZER_TYPES.NONE: {
-            console.warn('WARNING: USING NO SERIALIZER! MAKE SURE MESSAGE IS PROPERLY BUFFERED BEFORE PASSING INTO CENTRUM MESSENGER!!!!');
             return {
                 encode: null,
                 decode: null,

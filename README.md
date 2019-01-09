@@ -2,10 +2,10 @@ Low level and lightweight messaging library that wraps around ZMQ sockets to cre
 
 Simple request/response servers:
 
-    Originally the broker would have been a normal parameter to the Messenger constructor, but now
-    the idea is to put it inside your options if you're using a messenger that needs it. So since both
-    request and response messengers use it, 'brokerURI' must be in the options and will throw an error
-    if you don't provide one. Same thing for the server Ids now. They will be passed in from the options.
+   Originally the broker would have been a normal parameter to the Messenger constructor, but now
+   the idea is to put it inside your options if you're using a messenger that needs it. So since both
+   request and response messengers use it, 'brokerURI' must be in the options and will throw an error
+   if you don't provide one. Same thing for the server Ids now. They will be passed in from the options.
 
       var requestMessengerOptions = {
         id: "requestMessengerServer"
@@ -106,53 +106,51 @@ Simple request/response servers:
     to remove a publisher its
         messenger.removePublish(name)
 
-    now you need to create your subscribers. Lets call what subscribers receiving a "Publication" You can pretty much think of it as an
-    emitted event in node.
+   now you need to create your subscribers. Lets call what subscribers receiving a "Publication" You can pretty much think of it as an
+   emitted event in node.
 
-    Very similar to the EventListener in node, a subscriber with a string name and it can have multiple handlers. If you
-    are a bit of newbie to javascript and not understand what i mean by "multiple handlers" think of it as just an array of
-    functions that get ran everytime it receives the "Publication" and each one of those functions receive the same parameter that
-    was sent in the Publication.
+   Very similar to the EventListener in node, a subscriber with a string name and it can have multiple handlers. If you
+   are a bit of newbie to javascript and not understand what i mean by "multiple handlers" think of it as just an array of
+   functions that get ran everytime it receives the "Publication" and each one of those functions receive the same parameter that
+   was sent in the Publication.
 
-    So right now the API for a subscriber is a bit choppy, and I will hopefully make it a bit more elegant eventually but they do
-    the job and do it right.
+   So right now the API for a subscriber is a bit choppy, and I will hopefully make it a bit more elegant eventually but they do
+   the job and do it right.
 
-    to create a subscriber theres two methods
-
+   to create a subscriber theres two methods
 
         messenger.createSubscription(subscriptionName, handlerId, handler)
-    or
+   or
         messenger.createOrAddSubscription(subscriptionName, handlerId, handler)
 
-    so basically the names arent great. If it was a perfect world and long function names were awesome I'd probably name them
+   the names arent great. If it was a perfect world and long function names were awesome I'd probably name them
 
-    messenger.createSubscription would become
+   messenger.createSubscription would become
         messenger.createSubscriptionAndHandlerOnlyIfThereIsNoSubscriptionAlreadyRegisteredWithThisName
 
-    and messenger.createOrAddSubscription would become
+   and messenger.createOrAddSubscription would become
 
         messenger.createSubscriptionIfItDoesNotExistOrIfItDoesExistAddAHandlerToIt
 
-    so yeah there you have it, psuedo code function names are the next giant paradigm shift in javascript just wait
+   so yeah there you have it, psuedo code function names are the next paradigm shift in javascript just wait
 
-    Maybe calling them MultiSub and SingleSub would be better
-    but we'll see.
+   Maybe calling them MultiSub and SingleSub would be better but we'll see.
 
-    The reason for these two functions technically isn't really a reason and you can accomplish the same exact thing if the only
-    function was createOrAddSubscription.. you can just check to see if the subscription id already exist with a simple lookup
-    in messenger.subscriber[lookupname] BUT.. there came a point when I was coding and realized sometimes you may not know that you only
-    need one and only one handler per subscription. By using createSubscription it forces you to make sure you aren't creating duplicate handlers. Now
-    this only really becomes important if you're dynamically adding/creationg pubs and subs, it makes sure your ongoing process will never try to add a second
-    handler when registering subscriptions.
+   The reason for these two functions technically isn't really a reason and you can accomplish the same exact thing if the only
+   function was createOrAddSubscription.. you can just check to see if the subscription id already exist with a simple lookup
+   in messenger.subscriber[lookupname] BUT.. there came a point when I was coding and realized sometimes you may not know that you only
+   need one and only one handler per subscription. By using createSubscription it forces you to make sure you aren't creating duplicate handlers. Now
+   this only really becomes important if you're dynamically adding/creationg pubs and subs, it makes sure your ongoing process will never try to add a second
+   handler when registering subscriptions.
 
-    This happened to me when I would initialize subscriptions with handlers in a for loop but some of them I would only want to register once if it was
-    something along the lines of a "master server" action.
+   this happened to me when I would initialize subscriptions with handlers in a for loop but some of them I would only want to register once if it was
+   something along the lines of a "master server" action.
 
-    It's kind of hard to explain the use case, and I'm not even quite sure if it's a good idea myself.
-    But it seemed to work well in the main Centrum library and allowed me to easier specifify 1:m and 1:1 connections that I winded up labeling as pulls/push
-    which may be wrong too.. but it works and it works well.
+   It's kind of hard to explain the use case, and I'm not even quite sure if it's a good idea myself.
+   But it seemed to work well in the main Centrum library and allowed me to easier specifify 1:m and 1:1 connections that I winded up labeling as pulls/push
+   which may be wrong too.. but it works and it works well.
 
-    OKAY SO BACK TO CREATE SUBSCRIPTIONS, heres an example of how messenger.createSubscription would look
+   OKAY SO BACK TO CREATE SUBSCRIPTIONS, heres an example of how messenger.createSubscription would look
         messenger.createSubscription("firstExamplePubSub", "unique", (data) => { // if you were to call these again it would throw an error.
             console.log(data) // 10 (go look back up at createPublish example 1)
         })
@@ -163,30 +161,30 @@ Simple request/response servers:
                 console.log(data) // 5 (go look back up at createPublish example 2)
        })
 
-    say its in a for loop
+   say its in a for loop
         for(let 1 = 0; i <= 5; i++) {
             messenger.createOrAddSubscription("secondExamplePubSub", `unique_handler_${i}`, (data) => {
                 console.log('output:' + (data + i))
             })
         }
 
-    so now if we call
+   so now if we call
         messenger.publish.secondExamplePubSub(1)
 
-    subscription will wind up printing out
+   subscription will wind up printing out
         output: 2
         output: 3
         output: 4
         output: 5
         output: 6
 
-    then to remove any of these subscriptions you have the following functions
+   then to remove any of these subscriptions you have the following functions
         removeSubscriptionById(id, name)
         removeAllSubscriptionsWithId(id)
         removeAllSubscriptionsWithName(name)
         removeAllSubscriptions()
 
 
-    So that's the end of the API for now that I feel like writing about. Still need to go over my jsdoc syntax before
-    making an html page for it. But I want to get this lib up on npm so I can start deploying test builds of my projects
-    using my libs easier.
+   So that's the end of the API for now that I feel like writing about. Still need to go over my jsdoc syntax before
+   making an html page for it. But I want to get this lib up on npm so I can start deploying test builds of my projects
+   using my libs easier.
