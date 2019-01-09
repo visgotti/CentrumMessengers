@@ -121,16 +121,18 @@ Simple request/response servers:
 
         messenger.createSubscription(subscriptionName, handlerId, handler)
    or
+
         messenger.createOrAddSubscription(subscriptionName, handlerId, handler)
 
    the names arent great. If it was a perfect world and long function names were awesome I'd probably name them
 
    messenger.createSubscription would become
-       messenger.createSubscriptionAndHandlerOnlyIfThereIsNoSubscriptionAlreadyRegisteredWithThisName
+
+        messenger.createSubscriptionAndHandlerOnlyIfThereIsNoSubscriptionAlreadyRegisteredWithThisName
 
    and messenger.createOrAddSubscription would become
 
-       messenger.createSubscriptionIfItDoesNotExistOrIfItDoesExistAddAHandlerToIt
+        messenger.createSubscriptionIfItDoesNotExistOrIfItDoesExistAddAHandlerToIt
 
    so yeah there you have it, psuedo code function names are the next paradigm shift in javascript just wait
 
@@ -151,38 +153,43 @@ Simple request/response servers:
    which may be wrong too.. but it works and it works well.
 
    OKAY SO BACK TO CREATE SUBSCRIPTIONS, heres an example of how messenger.createSubscription would look
-       messenger.createSubscription("firstExamplePubSub", "unique", (data) => { // if you were to call these again it would throw an error.
-           console.log(data) // 10 (go look back up at createPublish example 1)
-       })
+
+        messenger.createSubscription("firstExamplePubSub", "unique", (data) => { // if you were to call these again it would throw an error.
+            console.log(data) // 10 (go look back up at createPublish example 1)
+        })
 
    or
 
-       messenger.createOrAddSubscription("secondExamplePubSub", "not_unique_1", (data) => {
-           console.log(data) // 5 (go look back up at createPublish example 2)
-       })
+        messenger.createOrAddSubscription("secondExamplePubSub", "not_unique_1", (data) => {
+            console.log(data) // 5 (go look back up at createPublish example 2)
+        })
 
    say its in a for loop
-       for(let 1 = 0; i <= 5; i++) {
-           messenger.createOrAddSubscription("secondExamplePubSub", `unique_handler_${i}`, (data) => {
-               console.log('output:' + (data + i))
-           })
-       }
+
+        for(let 1 = 0; i <= 5; i++) {
+            messenger.createOrAddSubscription("secondExamplePubSub", `unique_handler_${i}`, (data) => {
+                console.log('output:' + (data + i))
+            })
+        }
 
    so now if we call
-       messenger.publish.secondExamplePubSub(1)
+
+        messenger.publish.secondExamplePubSub(1)
 
    subscription will wind up printing out
-       output: 2
-       output: 3
-       output: 4
-       output: 5
-       output: 6
+
+        output: 2
+        output: 3
+        output: 4
+        output: 5
+        output: 6
 
    then to remove any of these subscriptions you have the following functions
-        removeSubscriptionById(id, name)
-        removeAllSubscriptionsWithId(id)
-        removeAllSubscriptionsWithName(name)
-        removeAllSubscriptions()
+
+         removeSubscriptionById(id, name)
+         removeAllSubscriptionsWithId(id)
+         removeAllSubscriptionsWithName(name)
+         removeAllSubscriptions()
 
 
    So that's the end of the API for now that I feel like writing about. Still need to go over my jsdoc syntax before
