@@ -2,24 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d8a098ec-7fbb-41ce-be50-584db6b1d9c2" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/Serializers.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/Serializers.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Broker.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Broker.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Centrum.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messenger.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messenger.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Publisher.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Publisher.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Requester.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Requester.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Responder.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Responder.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Subscriber.d.ts" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/dist/core/Messengers/Subscriber.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Serializers.ts" afterPath="$PROJECT_DIR$/src/Serializers.ts" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -53,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Serializers.ts" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Serializers.ts" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Serializers.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="205">
-              <caret line="29" column="9" lean-forward="true" selection-start-line="29" selection-start-column="9" selection-end-line="29" selection-end-column="9" />
+              <caret line="29" column="9" lean-forward="false" selection-start-line="29" selection-start-column="9" selection-end-line="29" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -107,11 +90,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2760">
-              <caret line="184" column="32" lean-forward="false" selection-start-line="184" selection-start-column="32" selection-end-line="184" selection-end-column="32" />
+            <state relative-caret-position="-410">
+              <caret line="123" column="8" lean-forward="true" selection-start-line="123" selection-start-column="8" selection-end-line="123" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -258,9 +241,9 @@
         <option value="$PROJECT_DIR$/test/Integration/RequestResponse.test.ts" />
         <option value="$PROJECT_DIR$/test/Integration/PubSub.test.ts" />
         <option value="$PROJECT_DIR$/test/messenger.config.json" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/dist/Serializers.js" />
         <option value="$PROJECT_DIR$/src/Serializers.ts" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -274,8 +257,8 @@
     <handled-path value="$PROJECT_DIR$/node_modules" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1669" />
-    <option name="y" value="76" />
+    <option name="x" value="69" />
+    <option name="y" value="127" />
     <option name="width" value="1531" />
     <option name="height" value="824" />
   </component>
@@ -480,15 +463,15 @@
       <workItem from="1546620499636" duration="24668000" />
       <workItem from="1546881087678" duration="6181000" />
       <workItem from="1546991489953" duration="4519000" />
-      <workItem from="1546996028002" duration="293000" />
+      <workItem from="1546996028002" duration="556000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="160175000" />
+    <option name="totallyTimeSpent" value="160438000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1669" y="76" width="1531" height="824" extended-state="0" />
+    <frame x="69" y="127" width="1531" height="824" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4058745" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -701,14 +684,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2760">
-          <caret line="184" column="32" lean-forward="false" selection-start-line="184" selection-start-column="32" selection-end-line="184" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tsconfig.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -747,7 +722,15 @@
     <entry file="file://$PROJECT_DIR$/src/Serializers.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="205">
-          <caret line="29" column="9" lean-forward="true" selection-start-line="29" selection-start-column="9" selection-end-line="29" selection-end-column="9" />
+          <caret line="29" column="9" lean-forward="false" selection-start-line="29" selection-start-column="9" selection-end-line="29" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-410">
+          <caret line="123" column="8" lean-forward="true" selection-start-line="123" selection-start-column="8" selection-end-line="123" selection-end-column="8" />
           <folding />
         </state>
       </provider>
